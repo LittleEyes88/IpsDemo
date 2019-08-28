@@ -8,10 +8,186 @@
         android:id="@+id/image_house_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/mercku_selector_btn_solid_gray_black"
-        android:scaleType="matrix"
         android:foregroundGravity="center"
+        android:scaleType="matrix"
+        android:src="@drawable/img_house_plan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/mercku_margin_twenty"
+        android:text="@string/drap_icon"
+        android:textColor="@color/mercku_text_gray"
+        android:textSize="@dimen/mercku_text_size_h12"
+        app:layout_constraintBottom_toTopOf="@+id/recycler_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:layout_marginBottom="@dimen/mercku_margin_fifteen"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/mercku_margin_ten"
+        android:paddingTop="@dimen/mercku_margin_fifteen"
+        android:paddingEnd="@dimen/mercku_margin_ten"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <!--    <LinearLayout
+            android:id="@+id/layout_nodes"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_marginBottom="@dimen/mercku_margin_fifteen"
+            android:background="@android:color/white"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/mercku_margin_ten"
+            android:paddingTop="@dimen/mercku_margin_fifteen"
+            android:paddingEnd="@dimen/mercku_margin_ten"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/mercku_margin_fifteen"
+                android:layout_marginEnd="@dimen/mercku_margin_fifteen"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_m3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_bg_logo"
+                    android:src="@drawable/img_m3_blank"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_m3_checked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_checked"
+                    app:layout_constraintBottom_toBottomOf="@+id/image_m3"
+                    app:layout_constraintEnd_toEndOf="@+id/image_m3" />
+
+                <TextView
+                    style="@style/mercku_TextBlackColorTwelveSp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="M3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_m3" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/mercku_margin_fifteen"
+                android:layout_marginEnd="@dimen/mercku_margin_fifteen"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_bee1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_bg_logo"
+                    android:src="@drawable/img_bee_blank"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_bee1_checked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_checked"
+                    app:layout_constraintBottom_toBottomOf="@+id/image_bee1"
+                    app:layout_constraintEnd_toEndOf="@+id/image_bee1" />
+
+                <TextView
+                    style="@style/mercku_TextBlackColorTwelveSp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bee1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_bee1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/mercku_margin_fifteen"
+                android:layout_marginEnd="@dimen/mercku_margin_fifteen"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_bee2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_bg_logo"
+                    android:src="@drawable/img_bee_blank"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_bee2_checked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_checked"
+                    app:layout_constraintBottom_toBottomOf="@+id/image_bee2"
+                    app:layout_constraintEnd_toEndOf="@+id/image_bee2" />
+
+                <TextView
+                    style="@style/mercku_TextBlackColorTwelveSp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bee2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_bee2" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/mercku_margin_fifteen"
+                android:layout_marginEnd="@dimen/mercku_margin_fifteen"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/image_bee3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_bg_logo"
+                    android:src="@drawable/img_bee_blank"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/image_bee3_checked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_checked"
+                    app:layout_constraintBottom_toBottomOf="@+id/image_bee3"
+                    app:layout_constraintEnd_toEndOf="@+id/image_bee3" />
+
+                <TextView
+                    style="@style/mercku_TextBlackColorTwelveSp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bee3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_bee3" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

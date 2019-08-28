@@ -4,22 +4,52 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mercku.base.ui.BaseContentActivity
 import java.io.File
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
-class AddLocatorActivity : BaseContentActivity() {
+class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemClickListener {
+    override fun onItemClick(position: Int, viewId: Int) {
+
+    }
+
+
+    private lateinit var mRecyclerView: RecyclerView
     private var mBitmap: Bitmap? = null
     private lateinit var mHouseLayoutImageView: ImageView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_add_locator)
+
         mHouseLayoutImageView = findViewById<ImageView>(R.id.image_house_layout)
+        initHouseLayout()
+
+        mRecyclerView = findViewById(R.id.recycler_view)
+        var layoutManager = LinearLayoutManager(this)
+        layoutManager.orientation = LinearLayout.HORIZONTAL
+        mRecyclerView.layoutManager = layoutManager
+
+        var data = ArrayList<IpsLocator>(4)
+        data.add(IpsLocator("M3", "M3"))
+        data.add(IpsLocator("Bee1", "Bee"))
+        data.add(IpsLocator("Bee2", "Bee"))
+        data.add(IpsLocator("Bee3", "Bee"))
+        mRecyclerView.adapter = LocatorAdapter(this, data, this)
+
+    }
+
+    private fun initHouseLayout() {
         var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
         var file = File(filePath)
         if (file.exists()) {
@@ -52,7 +82,13 @@ class AddLocatorActivity : BaseContentActivity() {
             }
         })
 
-
     }
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+
+        }
+    }
+
 
 }

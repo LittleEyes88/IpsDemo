@@ -40,7 +40,7 @@
     <color name="mercku_bg_divider_on_white">#f1f1f1</color>
 
     <color name="mercku_home_white">#ffffff</color>
-    <color name="mercku_bg_smart_home_device">#ffffff</color>
+    <color name="mercku_bg_smart_home_device">#FFFFFF</color>
     <color name="mercku_bg_smart_home_device_offline">#f1f1f1</color>
     <color name="mercku_bg_line">#363636</color>
     <color name="mercku_divier_color_light">#bdbdbd</color>

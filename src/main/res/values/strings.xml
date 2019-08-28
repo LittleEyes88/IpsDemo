@@ -7,4 +7,5 @@
     <string name="add_new_house">新建户型</string>
     <string name="no_house">暂无家庭</string>
     <string name="set_locator">设置定位坐标</string>
+    <string name="drap_icon">请长按图标拖动到想安装的位置</string>
 </resources>
