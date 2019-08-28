@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@android:color/white" />
+    <corners android:radius="5dp" />
+    <stroke
+        android:width="@dimen/mercku_line_height_one"
+        android:color="@color/mercku_bg_banner_gray"
+        android:dashWidth="4dp"
+        android:dashGap="2dp" />
+</shape>

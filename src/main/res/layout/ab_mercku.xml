@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/layout_top_title"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/mercku_light_bg"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/text_ab_title"
+                style="@style/mercku_TextBlackColorSixteenSp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/mercku_selector_common"
+                android:drawableLeft="@drawable/ic_back"
+                android:drawablePadding="@dimen/mercku_margin_sixteen"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="2"
+                android:paddingLeft="@dimen/mercku_margin_sixteen"
+                android:tag="@string/mercku_tag_ab_home"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layout_ab_middle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/text_ab_middle"
+                style="@style/mercku_TextBlackColorSixteenSp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/mercku_selector_common"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/mercku_margin_sixteen"
+                android:paddingRight="@dimen/mercku_margin_sixteen"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/layout_ab_right"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/text_ab_right"
+                style="@style/mercku_TextBlackColorSixteenSp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:background="@drawable/mercku_selector_common"
+                android:gravity="center_vertical|right"
+                android:paddingLeft="@dimen/mercku_margin_sixteen"
+                android:paddingRight="@dimen/mercku_margin_sixteen"
+                android:textColor="@color/mercku_text_black"/>
+
+            <ImageView
+                android:id="@+id/image_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="@dimen/mercku_margin_sixteen"
+                android:visibility="gone"/>
+        </FrameLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view_top_title_divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mercku_line_height_one"
+        android:layout_below="@+id/layout_top_title"
+        android:background="@color/mercku_bg_divider_on_white"/>
+
+</RelativeLayout>

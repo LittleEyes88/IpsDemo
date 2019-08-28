@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">IPSDemo</string>
+    <string name="merkcu_trans0269">You have denied Mercku to use your gallery. Please authorize in Settings</string>
+    <string name="mercku_trans0270">You have denied Mercku to use your storage. Please authorize in Settings</string>
+    <string name="mercku_tag_ab_home">tag_ab_home</string>
+    <string name="my_family">我的家庭</string>
+    <string name="add_new_house">新建户型</string>
+    <string name="no_house">暂无家庭</string>
+    <string name="set_locator">设置定位坐标</string>
+</resources>
