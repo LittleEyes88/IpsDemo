@@ -18,11 +18,8 @@ import java.io.File
  * Created by yanqiong.ran on 2019-08-28.
  */
 class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemClickListener {
-    override fun onItemClick(position: Int, viewId: Int) {
 
-    }
-
-
+    private lateinit var mData: ArrayList<IpsLocator>
     private lateinit var mRecyclerView: RecyclerView
     private var mBitmap: Bitmap? = null
     private lateinit var mHouseLayoutImageView: ImageView
@@ -40,12 +37,12 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
         layoutManager.orientation = LinearLayout.HORIZONTAL
         mRecyclerView.layoutManager = layoutManager
 
-        var data = ArrayList<IpsLocator>(4)
-        data.add(IpsLocator("M3", "M3"))
-        data.add(IpsLocator("Bee1", "Bee"))
-        data.add(IpsLocator("Bee2", "Bee"))
-        data.add(IpsLocator("Bee3", "Bee"))
-        mRecyclerView.adapter = LocatorAdapter(this, data, this)
+        mData = ArrayList<IpsLocator>(4)
+        mData.add(IpsLocator("M3", "M3"))
+        mData.add(IpsLocator("Bee1", "Bee"))
+        mData.add(IpsLocator("Bee2", "Bee"))
+        mData.add(IpsLocator("Bee3", "Bee"))
+        mRecyclerView.adapter = LocatorAdapter(this, mData, this)
 
     }
 
@@ -88,6 +85,20 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
         when (view?.id) {
 
         }
+    }
+
+    override fun onItemClick(position: Int, viewId: Int) {
+        var ipsLocator = mData[position]
+        ipsLocator.mIsSelected = true
+        var pos = 0
+        while (pos < mData.size) {
+            var locator = mData[position]
+            if (pos != position && locator.mIsSelected) {
+                locator.mIsAdded = true
+            }
+        }
+        mRecyclerView.adapter?.notifyDataSetChanged()
+        //todo ,add icons
     }
 
 
