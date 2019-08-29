@@ -10,7 +10,7 @@ import android.view.View
  */
 
 
-class DotMoveListener(private val mTargetView: View) : View.OnTouchListener {
+class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDotMoveFinishListener: OnDotMoveFinishListener) : View.OnTouchListener {
 
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
@@ -53,6 +53,7 @@ class DotMoveListener(private val mTargetView: View) : View.OnTouchListener {
             MotionEvent.ACTION_POINTER_DOWN -> {
                 mMode = 0
                 mTargetView.isSelected = false
+                mOnDotMoveFinishListener.onFinish(mTargetView.x, mTargetView.y, mId)
             }
         }
         return true

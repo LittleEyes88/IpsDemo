@@ -9,6 +9,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mercku.base.ui.BaseContentActivity
@@ -16,16 +17,18 @@ import com.mercku.ipsdemo.*
 import com.mercku.ipsdemo.adapter.LocatorAdapter
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.constants.TypeConstants
-import com.mercku.ipsdemo.listener.DotMoveListener
+import com.mercku.ipsdemo.listener.DotTouchListener
 import com.mercku.ipsdemo.listener.ImageTouchListener
+import com.mercku.ipsdemo.listener.OnDotMoveFinishListener
 import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.IpsLocator
 import java.io.File
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
-class AddLocatorActivity : BaseContentActivity(), OnItemClickListener {
+class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMoveFinishListener {
 
     private lateinit var mData: ArrayList<IpsLocator>
     private lateinit var mRecyclerView: RecyclerView
@@ -48,22 +51,23 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener {
         mRecyclerView.layoutManager = layoutManager
 
         mData = ArrayList<IpsLocator>(4)
-        mData.add(IpsLocator("M3", "M3"))
-        mData.add(IpsLocator("Bee1", "Bee"))
-        mData.add(IpsLocator("Bee2", "Bee"))
-        mData.add(IpsLocator("Bee3", "Bee"))
+        mData.add(IpsLocator("M3", "M3", "id00"))
+        mData.add(IpsLocator("Bee1", "Bee", "id01"))
+        mData.add(IpsLocator("Bee2", "Bee", "id02"))
+        mData.add(IpsLocator("Bee3", "Bee", "id03"))
         mRecyclerView.adapter = LocatorAdapter(this, mData, this)
 
     }
 
     private fun initHouseLayout() {
         var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+        android.util.Log.d("ryq", "AddLocatorActivity  filePath=" + filePath)
         var file = File(filePath)
         if (file.exists()) {
             var uri = Uri.fromFile(file)
             mBitmap = BitmapFactory.decodeStream(
                     getContentResolver().openInputStream(uri))
-            android.util.Log.d("ryq", "AddLocatorActivity  bitmap=" + mBitmap)
+
             mHouseImageView.setImageBitmap(mBitmap)
         }
         mHouseImageView.setOnTouchListener(ImageTouchListener(mHouseImageView))
@@ -92,14 +96,23 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener {
     }
 
     override fun onClickRightTitleView() {
-        var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-        var intent = Intent(this, SetHouseLayoutScaleActivity::class.java)
-        intent.putExtra(ExtraConstants.EXTRA_FILE_PATH, filePath)
-        startActivity(intent)
+        intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
+            var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+            android.util.Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
+            var house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
+            var intent = Intent(this, SetHouseLayoutScaleActivity::class.java)
+            intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
+            startActivity(intent)
+        }
+
+
     }
 
 
     override fun onItemClick(position: Int, viewId: Int) {
+        if (mBitmap == null) {
+            Toast.makeText(this, getString(R.string.choose_one_picture), Toast.LENGTH_LONG).show()
+        }
         var ipsLocator = mData[position]
         ipsLocator.mIsSelected = true
         var pos = 0
@@ -132,11 +145,36 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener {
             }
         }
         locatorTextView.text = locator.mName
-
-        dotView.setOnTouchListener(DotMoveListener(dotView))
+        locator.mLocation.y = 0.5f
+        locator.mLocation.x = 0.5f
+        dotView.setOnTouchListener(DotTouchListener(dotView, locator.mId, this))
         android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount)
         mHouseLayout.addView(dotView, mHouseLayout.childCount)
     }
 
+    override fun onFinish(x: Float, y: Float, id: String) {
+        if (mBitmap != null) {
 
+            android.util.Log.d("ryq", "onFinish x=" + x + " y=" + y
+                    + " mHouseImageView!!.left=" + mHouseImageView!!.left
+                    + " mHouseImageView!!.right=" + mHouseImageView!!.right
+                    + " mHouseImageView!!.top=" + mHouseImageView!!.top
+                    + " mHouseImageView!!.bottom=" + mHouseImageView!!.bottom)
+            for (ipsLocator in mData) {
+                if (ipsLocator.mId.equals(id)) {
+                    if (ipsLocator.mLocation.x < mHouseImageView!!.left
+                            || ipsLocator.mLocation.x > mHouseImageView!!.right
+                            || ipsLocator.mLocation.y < mHouseImageView!!.top
+                            || ipsLocator.mLocation.y > mHouseImageView!!.bottom) {
+                        Toast.makeText(this, getString(R.string.move_locator_in_house), Toast.LENGTH_LONG).show()
+                    } else {
+                        ipsLocator.mLocation.x = x / mBitmap!!.width
+                        ipsLocator.mLocation.y = y / mBitmap!!.height
+                    }
+
+                }
+            }
+        }
+
+    }
 }

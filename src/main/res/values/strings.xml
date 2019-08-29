@@ -2,7 +2,7 @@
     <string name="app_name">IPSDemo</string>
     <string name="merkcu_trans0269">You have denied Mercku to use your gallery. Please authorize in Settings</string>
     <string name="mercku_trans0270">You have denied Mercku to use your storage. Please authorize in Settings</string>
-    <string name="mercku_tag_ab_home">tag_ab_home</string>
+    <string name="mercku_tag_ab_home">TAG_AB_HOME</string>
     <string name="my_family">我的家庭</string>
     <string name="add_new_house">新建户型</string>
     <string name="no_house">暂无家庭</string>
@@ -11,4 +11,8 @@
     <string name="text_next">下一步</string>
     <string name="set_scale">设置比例尺</string>
     <string name="save">保存</string>
+    <string name="house_hint">缩放格子大小直到与房门尺寸相同\n\n每格方格的长宽为1m,格子放大缩小不影响实际测量尺寸</string>
+    <string name="my_home">我的家庭</string>
+    <string name="choose_one_picture">请先选择一张图片</string>
+    <string name="move_locator_in_house">请将locator移动到户型图中</string>
 </resources>

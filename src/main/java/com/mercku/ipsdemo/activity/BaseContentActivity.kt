@@ -36,8 +36,6 @@ open class BaseContentActivity : BaseActivity() {
 
     private var mTopTitleDividerLineView: View? = null
 
-    private val TAG = "TAG_AB_HOME"
-
     protected val contentLayout: ViewGroup?
         get() = mContentLayout
 
@@ -130,7 +128,7 @@ open class BaseContentActivity : BaseActivity() {
         }
 
         // listen to click on home
-        val homeView = mActionBarLayout?.findViewWithTag<View>(TAG)
+        val homeView = mActionBarLayout?.findViewWithTag<View>(getString(R.string.mercku_tag_ab_home))
         homeView?.setOnClickListener { onHomeSelected() }
     }
 

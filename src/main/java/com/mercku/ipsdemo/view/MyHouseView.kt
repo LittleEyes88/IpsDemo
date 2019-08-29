@@ -15,6 +15,7 @@ import android.graphics.PointF
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Region
+import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -26,10 +27,12 @@ import android.widget.Toast
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.FreeRoom
 import com.mercku.ipsdemo.model.IntersectionArea
+import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.util.MathUtil
 import com.mercku.ipsdemo.view.BaseEditView.Companion.DEFAULT_DOT_RADIUS
 import com.mercku.ipsdemo.view.BaseEditView.Companion.NONE_TOUCH
+import java.io.File
 
 import java.util.ArrayList
 
@@ -38,6 +41,7 @@ import java.util.ArrayList
  */
 class MyHouseView : BaseEditView {
 
+    private var mHouseDetail: IpsHouse? = null
     private var mHouseBitmap: Bitmap? = null
 
 
@@ -80,12 +84,20 @@ class MyHouseView : BaseEditView {
         }
     }
 
+    fun setHouseDetail(ipsHouse: IpsHouse?) {
+        ipsHouse?.let {
+            mHouseDetail = ipsHouse
+            Log.d(BaseEditView.TAG, "setHouseDetail mHouseDetail=" + mHouseDetail)
+            postInvalidate()
+        }
 
-    fun setImageBitmap(bitmap: Bitmap?) {
-        mHouseBitmap = Bitmap.createBitmap(bitmap);
-        Log.d(BaseEditView.TAG, "setImageBitmap mHouseBitmap=" + mHouseBitmap)
-        postInvalidate()
     }
+
+    /* fun setImageBitmap(bitmap: Bitmap?) {
+         mHouseBitmap = Bitmap.createBitmap(bitmap);
+         Log.d(BaseEditView.TAG, "setImageBitmap mHouseBitmap=" + mHouseBitmap)
+         postInvalidate()
+     }*/
 
     override fun onDraw(canvas: Canvas) {
         /* Log.d(BaseEditView.TAG, "onDraw canvas getLeft=" + left +
@@ -101,37 +113,56 @@ class MyHouseView : BaseEditView {
         canvas.drawPaint(clearPaint);
         clearPaint.setXfermode(PorterDuffXfermode(PorterDuff.Mode.SRC));*/
 
-        var paint = Paint()
-        paint.isAntiAlias = true
-
-        Log.d(BaseEditView.TAG, "onDraw canvas mHouseBitmap=" + mHouseBitmap)
-
-        mHouseBitmap?.let {
-            var matrix = Matrix()
-            matrix.preTranslate(width / 2.0f - mHouseBitmap!!.width / 2.0f, height / 2.0f - mHouseBitmap!!.height / 2.0f)
-            canvas.drawBitmap(mHouseBitmap, matrix, paint);
-        }
+        drawHouseDetail(canvas)
         canvas.save()
         drawBackground(canvas)
         canvas.restore()
         canvas.scale(mTotalScaled, mTotalScaled, mZoomMidPoint.x, mZoomMidPoint.y)
 
-        //draw dots
-        drawDots(canvas)
 
         //canvas.restore();
 
     }
 
-    private fun drawDots(canvas: Canvas) {
-        for (index in mDotList.indices) {
-            val dot = mDotList[index]
-            if (mSelectedDotIndex == index) {
-                canvas.drawCircle(dot.cx, dot.cy, BaseEditView.DEFAULT_DOT_RADIUS, mFocusedHousePaint)
-            } else {
-                canvas.drawCircle(dot.cx, dot.cy, BaseEditView.DEFAULT_DOT_RADIUS, mHousePaint)
+    private fun drawHouseDetail(canvas: Canvas) {
+        var paint = Paint()
+        paint.isAntiAlias = true
+
+        Log.d(BaseEditView.TAG, "drawHouseDetail canvas mHouseBitmap=" + mHouseBitmap)
+
+        mHouseDetail?.mImageFilePath?.let {
+            var file = File(mHouseDetail!!.mImageFilePath)
+            if (file.exists()) {
+                var uri = Uri.fromFile(file)
+                var bitmap = BitmapFactory.decodeStream(
+                        mContext.getContentResolver().openInputStream(uri))
+                android.util.Log.d("ryq", "drawHouseDetail  bitmap=" + bitmap)
+                mHouseBitmap = Bitmap.createBitmap(bitmap)
             }
+
+            var imgMatrix = Matrix()
+            var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
+            var imgDy = height / 2.0f - mHouseBitmap!!.height / 2.0f
+            imgMatrix.preTranslate(imgDx, imgDy)
+            canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
+
+
+            mHouseDetail?.mData?.let {
+                for (locator in mHouseDetail!!.mData!!) {
+                    if (locator.mLocation.x > 0 && locator.mLocation.y > 0) {
+                        var temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
+                        var dotBitmp = Bitmap.createBitmap(temp);
+                        var matrix = Matrix()
+                        matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocation.x, imgDy + mHouseBitmap!!.height * locator.mLocation.y)
+                        canvas.drawBitmap(dotBitmp, matrix, paint)
+                    }
+
+                }
+            }
+
         }
+
+
     }
 
 
@@ -343,6 +374,7 @@ class MyHouseView : BaseEditView {
         mScroller.startScroll(mScroller.startX, mScroller.startY, dx, dy)
         postInvalidate()
     }
+
 
     private inner class ScaleGestureListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         // Focus point at the start of the pinch gesture. This is used for computing proper scroll

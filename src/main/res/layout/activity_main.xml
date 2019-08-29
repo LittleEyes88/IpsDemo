@@ -24,7 +24,7 @@
             style="@style/mercku_TextBlackColorSixteenSp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableStart="@android:drawable/ic_menu_add"
+            android:drawableStart="@drawable/ic_add"
             android:drawablePadding="@dimen/mercku_margin_ten"
             android:gravity="center"
             android:text="@string/add_new_house"
