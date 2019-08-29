@@ -4,11 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewTreeObserver
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mercku.base.ui.BaseContentActivity
@@ -22,14 +21,16 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
     private lateinit var mData: ArrayList<IpsLocator>
     private lateinit var mRecyclerView: RecyclerView
     private var mBitmap: Bitmap? = null
-    private lateinit var mHouseLayoutImageView: ImageView
+    private lateinit var mHouseImageView: ImageView
 
+    private lateinit var mHouseLayout: ViewGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_add_locator)
 
-        mHouseLayoutImageView = findViewById<ImageView>(R.id.image_house_layout)
+        mHouseLayout = findViewById(R.id.house_layout)
+        mHouseImageView = findViewById<ImageView>(R.id.image_house)
         initHouseLayout()
 
         mRecyclerView = findViewById(R.id.recycler_view)
@@ -54,17 +55,17 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
             mBitmap = BitmapFactory.decodeStream(
                     getContentResolver().openInputStream(uri))
             android.util.Log.d("ryq", "AddLocatorActivity  bitmap=" + mBitmap)
-            mHouseLayoutImageView.setImageBitmap(mBitmap)
+            mHouseImageView.setImageBitmap(mBitmap)
         }
-        mHouseLayoutImageView.setOnTouchListener(ImageTouchListener(mHouseLayoutImageView))
-        mHouseLayoutImageView.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        mHouseImageView.setOnTouchListener(ImageTouchListener(mHouseImageView))
+        mHouseImageView.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
-                var houseLayoutHeight = mHouseLayoutImageView.height
-                var houseLayoutWidth = mHouseLayoutImageView.width
+                var houseLayoutHeight = mHouseImageView.height
+                var houseLayoutWidth = mHouseImageView.width
                 android.util.Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight)
                 android.util.Log.d("ryq", " houseLayoutWidth=" + houseLayoutWidth)
-                var matrix = mHouseLayoutImageView.imageMatrix
+                var matrix = mHouseImageView.imageMatrix
                 if (mBitmap != null) {
                     android.util.Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
                     matrix.postTranslate((houseLayoutWidth / 2).toFloat() - mBitmap!!.width / 2, (houseLayoutHeight / 2).toFloat() - mBitmap!!.height / 2)
@@ -72,9 +73,9 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
                     matrix.postTranslate((houseLayoutWidth / 2).toFloat(), (houseLayoutHeight / 2).toFloat())
                 }
 
-                mHouseLayoutImageView.imageMatrix = matrix
+                mHouseImageView.imageMatrix = matrix
 
-                mHouseLayoutImageView.getViewTreeObserver()
+                mHouseImageView.getViewTreeObserver()
                         .removeOnGlobalLayoutListener(this)
             }
         })
@@ -91,14 +92,39 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
         var ipsLocator = mData[position]
         ipsLocator.mIsSelected = true
         var pos = 0
+        android.util.Log.d("ryq", "onItemClick position=" + position)
         while (pos < mData.size) {
-            var locator = mData[position]
+            var locator = mData[pos]
+            android.util.Log.d("ryq", "onItemClick pos=" + pos + " locator.mIsSelected=" + locator.mIsSelected)
             if (pos != position && locator.mIsSelected) {
                 locator.mIsAdded = true
             }
+            pos++
         }
         mRecyclerView.adapter?.notifyDataSetChanged()
-        //todo ,add icons
+        addDotToHouse(ipsLocator, position)
+    }
+
+    private fun addDotToHouse(locator: IpsLocator, position: Int) {
+        var dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
+        var locatorImageView = dotView.findViewById<ImageView>(R.id.image_locator)
+        var locatorTextView = dotView.findViewById<TextView>(R.id.text_locator)
+
+        when (locator.mType) {
+            TypeConstants.TYPE_M3 -> {
+                locatorImageView.setImageResource(R.drawable.selector_coordinate_m3)
+
+            }
+            TypeConstants.TYPE_Bee -> {
+                locatorImageView.setImageResource(R.drawable.selector_coordinate_bee)
+
+            }
+        }
+        locatorTextView.text = locator.mName
+
+        dotView.setOnTouchListener(DotMoveListener(dotView))
+        android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount)
+        mHouseLayout.addView(dotView, mHouseLayout.childCount)
     }
 
 

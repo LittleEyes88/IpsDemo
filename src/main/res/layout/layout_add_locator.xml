@@ -4,16 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/image_house_layout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/house_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:foregroundGravity="center"
-        android:scaleType="matrix"
-        android:src="@drawable/img_house_plan"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/image_house"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:foregroundGravity="center"
+            android:scaleType="matrix"
+            android:src="@drawable/img_house_plan"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:layout_width="wrap_content"
