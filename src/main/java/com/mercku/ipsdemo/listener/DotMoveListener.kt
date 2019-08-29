@@ -1,7 +1,6 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.listener
 
 
-import android.graphics.Matrix
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View

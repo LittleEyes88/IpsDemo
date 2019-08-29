@@ -1,4 +1,4 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.model
 
 import android.graphics.PointF
 

@@ -2,6 +2,7 @@ package com.mercku.base.ui
 
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,7 @@ open class BaseContentActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+        requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         super.onCreate(savedInstanceState)
     }
 

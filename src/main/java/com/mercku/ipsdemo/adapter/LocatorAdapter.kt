@@ -1,13 +1,16 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.adapter
 
 import android.content.Context
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.mercku.ipsdemo.model.IpsLocator
+import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.constants.TypeConstants
+import com.mercku.ipsdemo.listener.OnItemClickListener
 
 class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLocator>, val mOnItemClickListener: OnItemClickListener) : RecyclerView.Adapter<LocatorAdapter.LocatorViewHolder>() {
 
@@ -15,6 +18,7 @@ class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLoca
         var rootView = LayoutInflater.from(mContext).inflate(R.layout.cell_locator, parent, false)
         var holder = LocatorViewHolder(rootView)
         rootView.setOnClickListener {
+            android.util.Log.d("ryq", "onCreateViewHolder holder.adapterPosition=" + holder.adapterPosition+" rootView.id="+rootView.id)
             mOnItemClickListener.onItemClick(holder.adapterPosition, rootView.id)
         }
         return holder
@@ -27,6 +31,8 @@ class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLoca
     override fun onBindViewHolder(holder: LocatorViewHolder, position: Int) {
         if (position > RecyclerView.NO_POSITION) {
             var ipsLocator = mData[position]
+            android.util.Log.d("ryq", "onBindViewHolder ipsLocator.mType=" + ipsLocator.mType+" ipsLocator.mIsSelected="+ipsLocator.mIsSelected
+            +" ipsLocator.mIsAdded="+ipsLocator.mIsAdded)
             when (ipsLocator.mType) {
                 TypeConstants.TYPE_M3 -> {
                     holder.mLocatorImageView.setImageResource(R.drawable.img_m3_blank)

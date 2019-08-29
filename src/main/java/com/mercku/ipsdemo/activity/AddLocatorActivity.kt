@@ -1,5 +1,6 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.activity
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -11,12 +12,20 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mercku.base.ui.BaseContentActivity
+import com.mercku.ipsdemo.*
+import com.mercku.ipsdemo.adapter.LocatorAdapter
+import com.mercku.ipsdemo.constants.ExtraConstants
+import com.mercku.ipsdemo.constants.TypeConstants
+import com.mercku.ipsdemo.listener.DotMoveListener
+import com.mercku.ipsdemo.listener.ImageTouchListener
+import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.model.IpsLocator
 import java.io.File
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
-class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemClickListener {
+class AddLocatorActivity : BaseContentActivity(), OnItemClickListener {
 
     private lateinit var mData: ArrayList<IpsLocator>
     private lateinit var mRecyclerView: RecyclerView
@@ -28,7 +37,7 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_add_locator)
-
+        setRightTitleText(getString(R.string.text_next))
         mHouseLayout = findViewById(R.id.house_layout)
         mHouseImageView = findViewById<ImageView>(R.id.image_house)
         initHouseLayout()
@@ -82,11 +91,13 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
 
     }
 
-    override fun onClick(view: View?) {
-        when (view?.id) {
-
-        }
+    override fun onClickRightTitleView() {
+        var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+        var intent = Intent(this, SetHouseLayoutScaleActivity::class.java)
+        intent.putExtra(ExtraConstants.EXTRA_FILE_PATH, filePath)
+        startActivity(intent)
     }
+
 
     override fun onItemClick(position: Int, viewId: Int) {
         var ipsLocator = mData[position]
@@ -102,10 +113,10 @@ class AddLocatorActivity : BaseContentActivity(), View.OnClickListener, OnItemCl
             pos++
         }
         mRecyclerView.adapter?.notifyDataSetChanged()
-        addDotToHouse(ipsLocator, position)
+        addDotToHouse(ipsLocator)
     }
 
-    private fun addDotToHouse(locator: IpsLocator, position: Int) {
+    private fun addDotToHouse(locator: IpsLocator) {
         var dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
         var locatorImageView = dotView.findViewById<ImageView>(R.id.image_locator)
         var locatorTextView = dotView.findViewById<TextView>(R.id.text_locator)

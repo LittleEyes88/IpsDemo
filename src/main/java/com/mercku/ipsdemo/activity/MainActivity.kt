@@ -1,4 +1,4 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.activity
 
 import android.Manifest
 import android.app.Activity
@@ -8,16 +8,14 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.ViewStub
 import android.widget.TextView
-import androidx.appcompat.view.ActionBarPolicy
 import androidx.recyclerview.widget.RecyclerView
 import com.mercku.base.ui.BaseContentActivity
+import com.mercku.ipsdemo.constants.ExtraConstants
+import com.mercku.ipsdemo.util.FileUtil
+import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.constants.RequestConstants
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
-import android.R.attr.data
-import android.graphics.BitmapFactory
-import android.net.Uri
-import androidx.core.app.NotificationCompat.getExtras
-import java.io.File
 
 
 class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks {
@@ -101,7 +99,7 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks 
 
                     }
                     data?.data?.let {
-                        var filePath=FileUtil.getPathFromUri(data!!.data!!, this@MainActivity)
+                        var filePath = FileUtil.getPathFromUri(data.data, this@MainActivity)
                         var intent = Intent(this, AddLocatorActivity::class.java)
                         intent.putExtra(ExtraConstants.EXTRA_FILE_PATH, filePath)
                         startActivity(intent)

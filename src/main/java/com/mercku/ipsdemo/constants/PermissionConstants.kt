@@ -1,4 +1,4 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.constants
 
 /**
  * Created by Administrator on 2018/2/1.

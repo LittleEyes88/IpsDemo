@@ -1,4 +1,4 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.util
 
 import android.app.Activity
 import android.content.ActivityNotFoundException

@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.mercku.ipsdemo.ActivityUtils
-import com.mercku.ipsdemo.PermissionConstants
+import com.mercku.ipsdemo.util.ActivityUtils
+import com.mercku.ipsdemo.constants.PermissionConstants
 import com.mercku.ipsdemo.R
 
 

@@ -8,4 +8,7 @@
     <string name="no_house">暂无家庭</string>
     <string name="set_locator">设置定位坐标</string>
     <string name="drap_icon">请长按图标拖动到想安装的位置</string>
+    <string name="text_next">下一步</string>
+    <string name="set_scale">设置比例尺</string>
+    <string name="save">保存</string>
 </resources>

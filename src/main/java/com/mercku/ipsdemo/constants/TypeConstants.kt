@@ -1,4 +1,4 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.constants
 
 object TypeConstants {
     const val TYPE_M3 = "M3"

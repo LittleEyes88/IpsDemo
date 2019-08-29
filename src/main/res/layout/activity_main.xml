@@ -8,7 +8,7 @@
     android:paddingStart="@dimen/mercku_margin_twenty"
     android:paddingTop="@dimen/mercku_margin_ten"
     android:paddingEnd="@dimen/mercku_margin_twenty"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_new_house"

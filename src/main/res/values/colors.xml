@@ -52,4 +52,7 @@
     <color name="mercku_bg_banner_light">#00000000</color>
     <color name="mercku_bg_banner_gray_light">#4d000000</color>
     <color name="mercku_red_dot_locator">#FFD6001C</color>
+
+    <color name="bg_grid_red">#FFD50000</color>
+    <color name="mercku_bg_transparent">#0D000000</color>
 </resources>

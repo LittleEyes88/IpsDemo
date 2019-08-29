@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/my_family">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,8 +22,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddLocatorActivity"
+            android:name=".activity.AddLocatorActivity"
             android:label="@string/set_locator" />
+        <activity
+            android:name=".activity.SetHouseLayoutScaleActivity"
+            android:label="@string/set_scale" />
     </application>
 
 </manifest>

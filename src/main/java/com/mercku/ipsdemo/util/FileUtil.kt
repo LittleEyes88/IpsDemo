@@ -1,9 +1,7 @@
-package com.mercku.ipsdemo
+package com.mercku.ipsdemo.util
 
 import android.content.ContentUris
 import android.content.Context
-import java.nio.file.Files.exists
-import android.os.Environment.getExternalStorageDirectory
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.Bitmap
 import android.net.Uri
@@ -54,8 +52,8 @@ object FileUtil {
         return baos.toByteArray()
     }
 
-    fun saveFile(context: Context, filePath: String?, fileName: String, bytes: ByteArray): String {
-        var filePath = filePath
+    fun saveFile(context: Context, file: String?, fileName: String, bytes: ByteArray): String {
+        var filePath = file
         var fileFullName = ""
         var fos: FileOutputStream? = null
         val dateFolder = SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA)
@@ -118,7 +116,7 @@ object FileUtil {
                 var contentUri = ContentUris.withAppendedId(
                         Uri.parse("content://downloads/public_downloads"),
                         docId.toLong());
-                imagePath = getImagePath(contentUri, null,context);
+                imagePath = getImagePath(contentUri, null, context);
             }
         } else if ("content".equals(uri.getScheme(), true)) {
             //Log.d(TAG, "content: " + uri.toString());
