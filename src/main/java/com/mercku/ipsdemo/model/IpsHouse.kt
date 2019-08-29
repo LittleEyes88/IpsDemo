@@ -8,11 +8,14 @@ import android.os.Parcelable
  * Created by yanqiong.ran on 2019-08-29.
  */
 data class IpsHouse(var mData: ArrayList<IpsLocator>?, var mName: String?, val mId: String, var mImageFilePath: String) : Parcelable {
+    var mBitmapActualWidth: Float = 0f
+
     constructor(parcel: Parcel) : this(
             parcel.createTypedArrayList(IpsLocator.CREATOR),
             parcel.readString(),
             parcel.readString(),
             parcel.readString()) {
+        mBitmapActualWidth = parcel.readFloat()
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -20,6 +23,7 @@ data class IpsHouse(var mData: ArrayList<IpsLocator>?, var mName: String?, val m
         parcel.writeString(mName)
         parcel.writeString(mId)
         parcel.writeString(mImageFilePath)
+        parcel.writeFloat(mBitmapActualWidth)
     }
 
     override fun describeContents(): Int {

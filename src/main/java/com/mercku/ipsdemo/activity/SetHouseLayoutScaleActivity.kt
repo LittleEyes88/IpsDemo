@@ -43,7 +43,8 @@ class SetHouseLayoutScaleActivity : BaseContentActivity() {
     }
 
     override fun onClickRightTitleView() {
-        //todo save the layout
+        var width = mCustomView.getActualBitmapWidth()
+        mIpsHouse.mBitmapActualWidth = width
         var intent = Intent(this, HouseLayoutDetailActivity::class.java)
         intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)
         startActivity(intent)

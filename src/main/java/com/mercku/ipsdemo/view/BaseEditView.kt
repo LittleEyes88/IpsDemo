@@ -249,6 +249,7 @@ open class BaseEditView : View {
         val WALL_WIDTH = 30f
         val NONE_TOUCH = -1
         val DEFAULT_PIX_INTERVAL = 60
+        val DEFAULT_EVERY_GRID_WIDTH = 1 //UNIT:m
         val DEFAULT_HOUSE_WIDTH = (DEFAULT_PIX_INTERVAL * 6).toFloat()//6个格子的宽度
         val DEFAULT_HOUSE_HEIGHT = (DEFAULT_PIX_INTERVAL * 6).toFloat()//6个格子的高度
         val DEFAULT_DOT_RADIUS = 20f

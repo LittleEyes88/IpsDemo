@@ -375,6 +375,16 @@ class MyHouseView : BaseEditView {
         postInvalidate()
     }
 
+    /**
+     * get actual width of bitmap
+     */
+    fun getActualBitmapWidth(): Float {
+        mHouseBitmap?.let {
+            return mHouseBitmap!!.width / DEFAULT_PIX_INTERVAL * DEFAULT_EVERY_GRID_WIDTH / mTotalScaled
+        }
+        return 0f
+    }
+
 
     private inner class ScaleGestureListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
         // Focus point at the start of the pinch gesture. This is used for computing proper scroll

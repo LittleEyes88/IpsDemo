@@ -4,27 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/house_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/mercku_margin_ten"
-        app:layout_constraintBottom_toTopOf="@+id/text_search"
+
+    <com.mercku.ipsdemo.view.MyLocatorView
+        android:id="@+id/layout_custom_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/image_house"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="matrix"
-            android:src="@drawable/img_house_plan"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toTopOf="parent"></com.mercku.ipsdemo.view.MyLocatorView>
 
     <TextView
         android:id="@+id/text_search"
@@ -42,10 +29,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-<!--    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/image_loading"
-        android:layout_width="@dimen/library_view_width_one_hundred"
-        android:layout_height="@dimen/library_view_height_one_hundred"
-        android:layout_gravity="center"
-        android:src="@drawable/library_anim_mercku_loading"/>-->
+    <!--    <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/image_loading"
+            android:layout_width="@dimen/library_view_width_one_hundred"
+            android:layout_height="@dimen/library_view_height_one_hundred"
+            android:layout_gravity="center"
+            android:src="@drawable/library_anim_mercku_loading"/>-->
 </androidx.constraintlayout.widget.ConstraintLayout>
