@@ -1,7 +1,6 @@
 package com.mercku.ipsdemo.activity
 
-import android.graphics.BitmapFactory
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -10,7 +9,6 @@ import com.mercku.base.ui.BaseContentActivity
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.model.IpsHouse
-import java.io.File
 
 /**
  * Created by yanqiong.ran on 2019-08-29.
@@ -30,14 +28,6 @@ class SetHouseLayoutScaleActivity : BaseContentActivity() {
         mIpsHouse = intent.getParcelableExtra<IpsHouse>(ExtraConstants.EXTRA_HOUSE_DETAIL)
         if (mIpsHouse == null)
             return
-       /* var file = File(mIpsHouse.mImageFilePath)
-        if (file.exists()) {
-            var uri = Uri.fromFile(file)
-            var bitmap = BitmapFactory.decodeStream(
-                    getContentResolver().openInputStream(uri))
-            android.util.Log.d("ryq", "SetHouseLayoutScaleActivity  bitmap=" + bitmap)
-            mCustomView.setImageBitmap(bitmap)
-        }*/
         android.util.Log.d("ryq", "SetHouseLayoutScaleActivity  mIpsHouse.mImageFilePath=" + mIpsHouse.mImageFilePath)
         //mCustomView.setImageBitmap(mIpsHouse.mBitmap)
         mCustomView.setHouseDetail(mIpsHouse)
@@ -54,5 +44,8 @@ class SetHouseLayoutScaleActivity : BaseContentActivity() {
 
     override fun onClickRightTitleView() {
         //todo save the layout
+        var intent = Intent(this, HouseLayoutDetailActivity::class.java)
+        intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)
+        startActivity(intent)
     }
 }

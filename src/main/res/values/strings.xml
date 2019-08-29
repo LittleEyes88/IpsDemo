@@ -15,4 +15,6 @@
     <string name="my_home">我的家庭</string>
     <string name="choose_one_picture">请先选择一张图片</string>
     <string name="move_locator_in_house">请将locator移动到户型图中</string>
+    <string name="search_sticker">查找sticker</string>
+    <string name="family_list">家庭列表</string>
 </resources>

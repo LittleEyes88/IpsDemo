@@ -27,6 +27,12 @@
         <activity
             android:name=".activity.SetHouseLayoutScaleActivity"
             android:label="@string/set_scale" />
+        <activity
+            android:name=".activity.HouseLayoutDetailActivity"
+            android:label="@string/my_family" />
+        <activity
+            android:name=".activity.SearchResultActivity"
+            android:label="@string/my_family" />
     </application>
 
 </manifest>
