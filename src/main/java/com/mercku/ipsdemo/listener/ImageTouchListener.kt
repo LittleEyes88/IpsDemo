@@ -41,6 +41,7 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
      */
     private var mMidPoint: PointF? = null
 
+    private var mTotalScaled = 1f// 初始scale倍数
     /**
      * 手指点击屏幕的触摸事件
      */
@@ -68,6 +69,7 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
                     if (endDis > 10f) { // 两个手指并拢在一起的时候像素大于10
                         val scale = endDis / mStartDis// 得到缩放倍数
                         mMatrix.set(mCurrentMatrix)
+                        mTotalScaled *= scale
                         mMatrix.postScale(scale, scale, mMidPoint!!.x, mMidPoint!!.y)
                     }
                 }// 放大缩小图片
@@ -110,6 +112,10 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
         val midX = (event.getX(1) + event.getX(0)) / 2
         val midY = (event.getY(1) + event.getY(0)) / 2
         return PointF(midX, midY)
+    }
+
+    public fun getTotalScaled(): Float {
+        return mTotalScaled
     }
 
     companion object {

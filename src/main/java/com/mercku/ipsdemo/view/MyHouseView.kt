@@ -41,10 +41,6 @@ import java.util.ArrayList
  */
 class MyHouseView : BaseEditView {
 
-    private var mHouseDetail: IpsHouse? = null
-    private var mHouseBitmap: Bitmap? = null
-
-
     internal var mMoveX = 0f
     internal var mMoveY = 0f
 
@@ -130,33 +126,37 @@ class MyHouseView : BaseEditView {
 
         Log.d(BaseEditView.TAG, "drawHouseDetail canvas mHouseBitmap=" + mHouseBitmap)
 
-        mHouseDetail?.mImageFilePath?.let {
+        if (mHouseDetail != null && mHouseDetail!!.mImageFilePath != null) {
             var file = File(mHouseDetail!!.mImageFilePath)
             if (file.exists()) {
                 var uri = Uri.fromFile(file)
                 var bitmap = BitmapFactory.decodeStream(
                         mContext.getContentResolver().openInputStream(uri))
-                android.util.Log.d("ryq", "drawHouseDetail  bitmap=" + bitmap)
+
                 mHouseBitmap = Bitmap.createBitmap(bitmap)
-            }
 
-            var imgMatrix = Matrix()
-            var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
-            var imgDy = height / 2.0f - mHouseBitmap!!.height / 2.0f
-            imgMatrix.preTranslate(imgDx, imgDy)
-            canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
+                Log.d(BaseEditView.TAG, "drawHouseDetail canvas width=" + width + " height=" + height
+                        + " mHouseBitmap!!.width=" + mHouseBitmap!!.width + " mHouseBitmap!!.height=" + mHouseBitmap!!.height)
+                //draw the house layout
+                var imgMatrix = Matrix()
+                var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
+                var imgDy = height / 2.0f - mHouseBitmap!!.height / 2.0f
+                imgMatrix.preTranslate(imgDx, imgDy)
+                canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
+                /**
+                 * draw all locators
+                 */
+                if (mHouseDetail!!.mData != null) {
+                    for (locator in mHouseDetail!!.mData!!) {
+                        if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                            var temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
+                            var dotBitmp = Bitmap.createBitmap(temp);
+                            var matrix = Matrix()
+                            matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocationActual.x, imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+                            canvas.drawBitmap(dotBitmp, matrix, paint)
+                        }
 
-
-            mHouseDetail?.mData?.let {
-                for (locator in mHouseDetail!!.mData!!) {
-                    if (locator.mLocation.x > 0 && locator.mLocation.y > 0) {
-                        var temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
-                        var dotBitmp = Bitmap.createBitmap(temp);
-                        var matrix = Matrix()
-                        matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocation.x, imgDy + mHouseBitmap!!.height * locator.mLocation.y)
-                        canvas.drawBitmap(dotBitmp, matrix, paint)
                     }
-
                 }
             }
 

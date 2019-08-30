@@ -41,9 +41,6 @@ import java.util.ArrayList
  */
 class MyLocatorView : BaseEditView {
 
-    private var mHouseDetail: IpsHouse? = null
-    private var mHouseBitmap: Bitmap? = null
-
     constructor(context: Context) : super(context) {
 
     }
@@ -100,11 +97,10 @@ class MyLocatorView : BaseEditView {
                 var dotBitmp = Bitmap.createBitmap(temp);
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    var nextLocator = mHouseDetail!!.mData!![(index + 1) % mHouseDetail!!.mData!!.size]
-                    if (locator.mLocation.x > 0 && locator.mLocation.y > 0) {
+                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
 
                         var matrix = Matrix()
-                        matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocation.x, imgDy + mHouseBitmap!!.height * locator.mLocation.y)
+                        matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocationActual.x, imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
                         canvas.drawBitmap(dotBitmp, matrix, paint)
                     }
                     index++
@@ -113,38 +109,45 @@ class MyLocatorView : BaseEditView {
                 index = 0
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    var nextLocator = mHouseDetail!!.mData!![(index + 1) % mHouseDetail!!.mData!!.size]
+
 
                     //todo 有负数
-                    android.util.Log.d("ryq", "drawHouseDetail   index=" + index+" locator.mLocation.x="+locator.mLocation.x
-                    +" locator.mLocation.y="+locator.mLocation.y
-                    +" nextLocator.mLocation.x="+nextLocator.mLocation.x
-                    +" nextLocator.mLocation.y="+nextLocator.mLocation.y)
+                    android.util.Log.d("ryq", "drawHouseDetail   index=" + index + " locator.mLocationActual.x=" + locator.mLocationActual.x
+                            + " locator.mLocationActual.y=" + locator.mLocationActual.y)
+                    var unit = mHouseDetail!!.mBitmapActualWidth / mHouseBitmap!!.width
+                    var curX = (imgDx + mHouseBitmap!!.width * locator.mLocationActual.x)
+                    var curDisX = curX * unit
+                    var curY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+                    var curDisY = curY * unit
 
-                    if (locator.mLocation.x > 0 && locator.mLocation.y > 0
-                            && nextLocator.mLocation.x > 0 && nextLocator.mLocation.y > 0) {
-                        var unit = mHouseDetail!!.mBitmapActualWidth / mHouseBitmap!!.width
-                        var curX = (imgDx + mHouseBitmap!!.width * locator.mLocation.x)
-                        var curDisX = curX * unit
-                        var curY = (imgDy + mHouseBitmap!!.height * locator.mLocation.y)
-                        var curDisY = curY * unit
+                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                        var nextIndex = index + 1
+                        while (nextIndex < mHouseDetail!!.mData!!.size) {
+                            var nextLocator = mHouseDetail!!.mData!![nextIndex]
+                            android.util.Log.d("ryq", "drawHouseDetail  "
+                                    + " nextLocator.mLocationActual.x=" + nextLocator.mLocationActual.x
+                                    + " nextLocator.mLocationActual.y=" + nextLocator.mLocationActual.y)
+                            if (nextLocator.mLocationActual.x > 0 && nextLocator.mLocationActual.y > 0) {
 
-                        var nextX = (imgDx + mHouseBitmap!!.width * nextLocator.mLocation.x)
-                        var nextDisX = nextX * unit
-                        var nextY = (imgDy + mHouseBitmap!!.height * nextLocator.mLocation.y)
-                        var nextDisY = nextY * unit
-                        android.util.Log.d("ryq", "drawHouseDetail  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
-                        var dis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
-                        var pixDis = Math.sqrt(((curX - nextX) * (curX - nextX) + (curY - nextY) * (curY - nextY)).toDouble())
-                        canvas.drawLine(curX + temp.width / 2, curY + temp.height / 2, nextX + temp.width / 2, nextY + temp.height / 2, mGridPaint)
-                        var path = Path()
-                        path.moveTo(curX, curY)
-                        path.lineTo(nextX, nextY)
+                                var nextX = (imgDx + mHouseBitmap!!.width * nextLocator.mLocationActual.x)
+                                var nextDisX = nextX * unit
+                                var nextY = (imgDy + mHouseBitmap!!.height * nextLocator.mLocationActual.y)
+                                var nextDisY = nextY * unit
+                                android.util.Log.d("ryq", "drawHouseDetail  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
+                                var dis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
+                                var pixDis = Math.sqrt(((curX - nextX) * (curX - nextX) + (curY - nextY) * (curY - nextY)).toDouble())
+                                canvas.drawLine(curX + temp.width / 2, curY + temp.height / 2, nextX + temp.width / 2, nextY + temp.height / 2, mLinePaint)
+                                var path = Path()
+                                path.moveTo(curX, curY)
+                                path.lineTo(nextX, nextY)
 
 
-                        android.util.Log.d("ryq", "drawHouseDetail  dis=" + dis)
-                        var disStr: String = String.format("%.1f", dis)
-                        canvas.drawTextOnPath(disStr + "m", path, (pixDis / 2).toFloat(), 0f, mTextPaint)
+                                android.util.Log.d("ryq", "drawHouseDetail  dis=" + dis)
+                                var disStr: String = String.format("%.1f", dis)
+                                canvas.drawTextOnPath(disStr + "m", path, (pixDis / 2).toFloat(), 0f, mTextPaint)
+                            }
+                            nextIndex++
+                        }
                     }
                     index++
 

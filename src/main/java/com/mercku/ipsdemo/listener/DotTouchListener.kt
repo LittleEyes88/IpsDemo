@@ -4,6 +4,8 @@ package com.mercku.ipsdemo.listener
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
+import com.mercku.ipsdemo.R
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
@@ -33,6 +35,10 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
                 mMode = MODE_DRAG
                 // 记录ImageView当前的移动位置
                 mStartPoint.set(event.x, event.y)
+                var locatorTextView = mTargetView.findViewById<TextView>(R.id.text_locator)
+                if (locatorTextView != null) {
+                    locatorTextView.visibility = View.GONE
+                }
             }
             // 手指在屏幕上移动，改事件会被不断触发
             MotionEvent.ACTION_MOVE ->
@@ -53,7 +59,7 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
             MotionEvent.ACTION_POINTER_DOWN -> {
                 mMode = 0
                 mTargetView.isSelected = false
-                mOnDotMoveFinishListener.onFinish(mTargetView.x, mTargetView.y, mId)
+                mOnDotMoveFinishListener.onFinish(mTargetView.x, mTargetView.y, mId, mTargetView)
             }
         }
         return true

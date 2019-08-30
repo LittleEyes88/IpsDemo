@@ -12,6 +12,7 @@ import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.model.RectRoom
 import com.mercku.ipsdemo.MyMatrix
 import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.util.MathUtil
 
 import java.util.AbstractList
@@ -46,6 +47,7 @@ open class BaseEditView : View {
     protected lateinit var mTextPaint: Paint
     protected lateinit var mFocusedHousePaint: Paint
     protected lateinit var mFocusedSidePaint: Paint
+    protected lateinit var mLinePaint: Paint
     protected var mLastSeletedViewIndex: Int = 0
     protected lateinit var mGridPaint: Paint
     protected var mScaleGestureDetector: ScaleGestureDetector? = null
@@ -67,6 +69,9 @@ open class BaseEditView : View {
     protected val DEFAULT_DOT_RADIUS = 20f
     protected val DEFAULT_CORNER_RADIUS = 20f
 
+
+    protected var mHouseDetail: IpsHouse? = null
+    protected var mHouseBitmap: Bitmap? = null
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -113,6 +118,16 @@ open class BaseEditView : View {
         mTextPaint.isAntiAlias = true//用于防止边缘的锯齿
         mTextPaint.textSize = context.resources.getDimensionPixelSize(R.dimen.mercku_text_size_h14).toFloat()
         mTextPaint.alpha = 1000//设置透明度
+
+
+        mLinePaint = Paint()
+        mLinePaint.color = resources.getColor(R.color.bg_grid_red)
+        mLinePaint.strokeJoin = Paint.Join.ROUND
+        mLinePaint.strokeCap = Paint.Cap.ROUND
+        mLinePaint.style = Paint.Style.STROKE
+        mLinePaint.strokeWidth = 5f
+        var linePathEffect: DashPathEffect = DashPathEffect(floatArrayOf(6.0f, 4.0f), 0f);
+        mLinePaint.pathEffect = linePathEffect
 
         mGridPaint = Paint()
         mGridPaint.color = resources.getColor(R.color.bg_grid_red)

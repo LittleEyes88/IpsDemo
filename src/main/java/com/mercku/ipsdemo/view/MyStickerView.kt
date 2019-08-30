@@ -41,9 +41,6 @@ import java.util.ArrayList
  */
 class MyStickerView : BaseEditView {
 
-    private var mHouseDetail: IpsHouse? = null
-    private var mHouseBitmap: Bitmap? = null
-
     constructor(context: Context) : super(context) {
 
     }
@@ -102,10 +99,10 @@ class MyStickerView : BaseEditView {
                 //draw locators
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mLocation.x > 0 && locator.mLocation.y > 0) {
+                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
 
                         var matrix = Matrix()
-                        var point: PointF = PointF(imgDx + mHouseBitmap!!.width * locator.mLocation.x, imgDy + mHouseBitmap!!.height * locator.mLocation.y)
+                        var point = PointF(imgDx + mHouseBitmap!!.width * locator.mLocationActual.x, imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
                         points.add(point)
                         matrix.preTranslate(point.x, point.y)
                         canvas.drawBitmap(dotBitmp, matrix, paint)
@@ -113,42 +110,44 @@ class MyStickerView : BaseEditView {
                     index++
 
                 }
-                //draw sticker
+                //get sticker's location
                 var center = MathUtil.getPolygenCenter(points)
                 var unit = mHouseDetail!!.mBitmapActualWidth / mHouseBitmap!!.width
-                var curX = center.cx
+                var curX = width / 2.0f
                 var curDisX = curX * unit
                 var curY = center.cy
-                var curDisY = curY * unit
-                var stickerTemp = BitmapFactory.decodeResource(resources, R.drawable.ic_checked)
-                var stickerBitmp = Bitmap.createBitmap(temp);
-                var matrix = Matrix()
-                matrix.preTranslate(curX, curY)
-                canvas.drawBitmap(stickerBitmp, matrix, paint)
+                var curDisY = height / 2.0f
+
                 //draw lines from dot to sticker
                 index = 0
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mLocation.x > 0 && locator.mLocation.y > 0) {
-                        var nextX = (imgDx + mHouseBitmap!!.width * locator.mLocation.x)
+                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                        var nextX = (imgDx + mHouseBitmap!!.width * locator.mLocationActual.x)
                         var nextDisX = nextX * unit
-                        var nextY = (imgDy + mHouseBitmap!!.height * locator.mLocation.y)
+                        var nextY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
                         var nextDisY = nextY * unit
                         android.util.Log.d("ryq", "drawHouseDetail2  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
                         var actualDis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
                         var pixDis = Math.sqrt(((curX - nextX) * (curX - nextX) + (curY - nextY) * (curY - nextY)).toDouble())
-                        canvas.drawLine(curX + temp.width / 2, curY + temp.height / 2, nextX + temp.width / 2, nextY + temp.height / 2, mGridPaint)
+                        canvas.drawLine(curX + temp.width / 2, curY + temp.height / 2, nextX + temp.width / 2, nextY + temp.height / 2, mLinePaint)
                         var path = Path()
-                        path.moveTo(nextX, nextX)
-                        path.lineTo(curX, curY)
+                        path.moveTo(curX, curY)
+                        path.lineTo(nextX, nextY)
                         //距离有问题，可能因为坐标错误
-                        android.util.Log.d("ryq", "drawHouseDetail2  dis=" + actualDis+" pixDis="+pixDis)
+                        android.util.Log.d("ryq", "drawHouseDetail2  dis=" + actualDis + " pixDis=" + pixDis)
                         var disStr: String = String.format("%.1f", actualDis)
-                        canvas.drawTextOnPath(disStr + "m", path, (pixDis/2).toFloat(), 0f, mTextPaint)
+                        canvas.drawTextOnPath(disStr + "m", path, (pixDis / 2).toFloat(), 0f, mTextPaint)
                     }
                     index++
 
                 }
+                //draw sticker
+                var stickerTemp = BitmapFactory.decodeResource(resources, R.drawable.ic_sticker)
+                var stickerBitmp = Bitmap.createBitmap(stickerTemp);
+                var matrix = Matrix()
+                matrix.preTranslate(curX - stickerBitmp.width / 2 + temp.width / 2, curY - stickerBitmp.height / 2 + temp.height / 2)
+                canvas.drawBitmap(stickerBitmp, matrix, paint)
 
             }
 

@@ -13,17 +13,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/selector_coordinate_m3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/image_locator_dot"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/image_locator_dot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/red_dot_locator"
+        android:src="@drawable/ic_location"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/image_locator"
         app:layout_constraintStart_toStartOf="@+id/image_locator"
-        app:layout_constraintTop_toBottomOf="@+id/image_locator" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_locator"
