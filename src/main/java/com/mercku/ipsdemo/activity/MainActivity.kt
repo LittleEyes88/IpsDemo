@@ -8,19 +8,23 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.ViewStub
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mercku.base.ui.BaseContentActivity
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.util.FileUtil
 import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.adapter.HouseLayoutAdapter
 import com.mercku.ipsdemo.constants.RequestConstants
+import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.model.IpsHouse
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 
 
-class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks {
+class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks, OnItemClickListener {
 
-
+    private lateinit var mData: ArrayList<IpsHouse>
     private lateinit var mAddNewHouseLayout: View
     private lateinit var mRecyclerView: RecyclerView
     private var mAddTextView: TextView? = null
@@ -31,11 +35,25 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks 
         setContentView(R.layout.activity_main)
 
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mData = ArrayList<IpsHouse>()
+        mRecyclerView.adapter = HouseLayoutAdapter(this, mData, this)
         mAddNewHouseLayout = findViewById<View>(R.id.layout_new_house)
-        showNoContentLayout(false)
+
+        showNoContentLayout(mData.size <= 0)
     }
 
-    public fun onClickAddNewHouse(view: View) {
+    override fun onItemClick(position: Int, viewId: Int) {
+        if (position < mData.size) {
+            var ipsHouse = mData[position]
+            var intent = Intent(this, HouseLayoutDetailActivity::class.java)
+            intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, ipsHouse)
+            startActivity(intent)
+        }
+    }
+
+
+    public fun onClickAdd(view: View) {
         if (EasyPermissions.hasPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             startChoosePictureActivityForResult()
         } else {
@@ -52,7 +70,7 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks 
 
                 mNoContentLayout = viewstub.findViewById(R.id.inflated)
                 mAddTextView = mNoContentLayout?.findViewById<TextView>(R.id.text_add)
-                mAddTextView?.setOnClickListener { onClickAddNewHouse(it) }
+                mAddTextView?.setOnClickListener { onClickAdd(it) }
             } else {
                 mNoContentLayout!!.visibility = View.VISIBLE
             }

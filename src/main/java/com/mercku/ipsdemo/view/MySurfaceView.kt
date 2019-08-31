@@ -54,7 +54,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
         mGridPaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
         mGridPaint.setColor(getResources().getColor(R.color.bg_grid_red));
         mGridPaint.setStrokeWidth(1f);//线条宽度
-        mGridPaint.setPathEffect(DashPathEffect(floatArrayOf(6.0f, 6.0f), 0f));//线的显示效果：破折号格式
+        mGridPaint.setPathEffect(DashPathEffect(floatArrayOf(5.0f, 6.0f), 0f));//线的显示效果：破折号格式
 
         mContext = context
         mHolder = holder
