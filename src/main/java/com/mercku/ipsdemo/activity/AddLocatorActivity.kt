@@ -197,8 +197,6 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             }
         }
         locatorTextView.text = locator.mName
-        locator.mLocation.y = mHouseLayout.width / 2.0f
-        locator.mLocation.x = mHouseLayout.height / 2.0f
 
         dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator.mId, this))
         android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
@@ -219,29 +217,33 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                     + " mHouseImageView!!.left=" + mHouseImageView!!.left
                     + " mHouseImageView!!.right=" + mHouseImageView!!.right
                     + " mHouseImageView!!.top=" + mHouseImageView!!.top
-                    + " mHouseImageView!!.bottom=" + mHouseImageView!!.bottom)
+                    + " mHouseImageView!!.bottom=" + mHouseImageView!!.bottom
+                    + " targetView.x=" + targetView.x
+                    + " targetView.y=" + targetView.y)
             for (ipsLocator in mData) {
                 if (ipsLocator.mId.equals(id)) {
-                    if (targetView.x < mHouseImageView!!.left
-                            || targetView.x > mHouseImageView!!.right
-                            || targetView.y < mHouseImageView!!.top
-                            || targetView.y > mHouseImageView!!.bottom) {
-                        Toast.makeText(this, getString(R.string.move_locator_in_house), Toast.LENGTH_LONG).show()
-                    } else {
+                    /* if (targetView.x < mHouseImageView!!.left
+                             || targetView.x > mHouseImageView!!.right
+                             || targetView.y < mHouseImageView!!.top
+                             || targetView.y > mHouseImageView!!.bottom) {
+                         Toast.makeText(this, getString(R.string.move_locator_in_house), Toast.LENGTH_LONG).show()
+                     } else {*/
 
-                        var locatorTextView = targetView.findViewById<TextView>(R.id.text_locator)
-                        locatorTextView.visibility = View.VISIBLE
-                        var locatorImageView = targetView.findViewById<ImageView>(R.id.image_locator)
-                        locatorImageView.visibility = View.INVISIBLE
+                    var locatorTextView = targetView.findViewById<TextView>(R.id.text_locator)
+                    locatorTextView.visibility = View.VISIBLE
+                    var locatorImageView = targetView.findViewById<ImageView>(R.id.image_locator)
+                    locatorImageView.visibility = View.INVISIBLE
 
-
-                        Log.d(BaseEditView.TAG, "onFinish dx=" + dx + " dy=" + dy
-                                + " targetView.width =" + targetView.width
-                                + " targetView.height =" + targetView.height)
-                        ipsLocator.mLocationActual.x += dx / mHouseImageView.width * mImageTouchListener.getTotalScaled()
-                        ipsLocator.mLocationActual.y += dy / mHouseImageView.height * mImageTouchListener.getTotalScaled()
-                    }
-
+                    Log.d(BaseEditView.TAG, "onFinish dx=" + dx + " dy=" + dy
+                            + " targetView.width =" + targetView.width
+                            + " targetView.height =" + targetView.height)
+                    ipsLocator.mLocationActual.x += dx / (mInitialWidth * mImageTouchListener.getTotalScaled())
+                    ipsLocator.mLocationActual.y += dy / (mInitialHeight * mImageTouchListener.getTotalScaled())
+                    Log.d(BaseEditView.TAG, "onFinish dx=" + dx + " dy=" + dy
+                            + "  ipsLocator.mLocationActual.x  =" + ipsLocator.mLocationActual.x
+                            + " ipsLocator.mLocationActual.y=" + ipsLocator.mLocationActual.y)
+                    // }
+                    break
                 }
             }
         }
@@ -253,9 +255,9 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
             var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
             android.util.Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
-            calculateEveryDotLocation()
+            // calculateEveryDotLocation()
             var house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
-            var intent = Intent(this, SurfaceViewActivity::class.java)
+            var intent = Intent(this, SetHouseLayoutScaleActivity::class.java)
             intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
             startActivity(intent)
         }

@@ -29,6 +29,7 @@ import com.mercku.ipsdemo.model.FreeRoom
 import com.mercku.ipsdemo.model.IntersectionArea
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.Node
+import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.util.MathUtil
 import com.mercku.ipsdemo.view.BaseEditView.Companion.DEFAULT_DOT_RADIUS
 import com.mercku.ipsdemo.view.BaseEditView.Companion.NONE_TOUCH
@@ -81,7 +82,7 @@ class MyStickerView : BaseEditView {
                 var bitmap = BitmapFactory.decodeStream(
                         mContext.getContentResolver().openInputStream(uri))
                 android.util.Log.d("ryq", "drawHouseDetail  bitmap=" + bitmap)
-                mHouseBitmap = Bitmap.createBitmap(bitmap)
+                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
             }
 
             var imgMatrix = Matrix()
@@ -99,12 +100,15 @@ class MyStickerView : BaseEditView {
                 //draw locators
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                    if (locator.mIsSelected || locator.mIsAdded) {
 
                         var matrix = Matrix()
-                        var point = PointF(imgDx + mHouseBitmap!!.width * locator.mLocationActual.x, imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+                        var transx = imgDx + mHouseBitmap!!.width * locator.mLocationActual.x
+                        var transy = imgDy + mHouseBitmap!!.height * locator.mLocationActual.y
+
+                        var point = PointF(transx, transy)
                         points.add(point)
-                        matrix.preTranslate(point.x, point.y)
+                        matrix.preTranslate(point.x - dotBitmp.width / 2, point.y - dotBitmp.height / 2)
                         canvas.drawBitmap(dotBitmp, matrix, paint)
                     }
                     index++
@@ -122,7 +126,7 @@ class MyStickerView : BaseEditView {
                 index = 0
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                    if (locator.mIsSelected || locator.mIsAdded) {
                         var nextX = (imgDx + mHouseBitmap!!.width * locator.mLocationActual.x)
                         var nextDisX = nextX * unit
                         var nextY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
@@ -130,7 +134,7 @@ class MyStickerView : BaseEditView {
                         android.util.Log.d("ryq", "drawHouseDetail2  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
                         var actualDis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
                         var pixDis = Math.sqrt(((curX - nextX) * (curX - nextX) + (curY - nextY) * (curY - nextY)).toDouble())
-                        canvas.drawLine(curX + temp.width / 2, curY + temp.height / 2, nextX + temp.width / 2, nextY + temp.height / 2, mLinePaint)
+                        canvas.drawLine(curX, curY, nextX, nextY, mLinePaint)
                         var path = Path()
                         path.moveTo(curX, curY)
                         path.lineTo(nextX, nextY)
@@ -146,7 +150,7 @@ class MyStickerView : BaseEditView {
                 var stickerTemp = BitmapFactory.decodeResource(resources, R.drawable.ic_sticker)
                 var stickerBitmp = Bitmap.createBitmap(stickerTemp);
                 var matrix = Matrix()
-                matrix.preTranslate(curX - stickerBitmp.width / 2 + temp.width / 2, curY - stickerBitmp.height / 2 + temp.height / 2)
+                matrix.preTranslate(curX - stickerBitmp.width / 2 /*+ temp.width / 2*/, curY - stickerBitmp.height / 2 /*+ temp.height / 2*/)
                 canvas.drawBitmap(stickerBitmp, matrix, paint)
 
             }

@@ -29,6 +29,7 @@ import com.mercku.ipsdemo.model.FreeRoom
 import com.mercku.ipsdemo.model.IntersectionArea
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.Node
+import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.util.MathUtil
 import com.mercku.ipsdemo.view.BaseEditView.Companion.DEFAULT_DOT_RADIUS
 import com.mercku.ipsdemo.view.BaseEditView.Companion.NONE_TOUCH
@@ -132,8 +133,8 @@ class MyHouseView : BaseEditView {
                 var uri = Uri.fromFile(file)
                 var bitmap = BitmapFactory.decodeStream(
                         mContext.getContentResolver().openInputStream(uri))
-
-                mHouseBitmap = Bitmap.createBitmap(bitmap)
+                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
+                // mHouseBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
 
                 Log.d(BaseEditView.TAG, "drawHouseDetail canvas width=" + width + " height=" + height
                         + " mHouseBitmap!!.width=" + mHouseBitmap!!.width + " mHouseBitmap!!.height=" + mHouseBitmap!!.height)
@@ -148,11 +149,15 @@ class MyHouseView : BaseEditView {
                  */
                 if (mHouseDetail!!.mData != null) {
                     for (locator in mHouseDetail!!.mData!!) {
-                        if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                        if (locator.mIsSelected || locator.mIsAdded) {
                             var temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
                             var dotBitmp = Bitmap.createBitmap(temp);
                             var matrix = Matrix()
-                            matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocationActual.x, imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+                            Log.d(BaseEditView.TAG, "drawHouseDetail canvaslocator.mLocationActual.x=" + locator.mLocationActual.x
+                                    + " locator.mLocationActual.y=" + locator.mLocationActual.y)
+                            var transx = imgDx + mHouseBitmap!!.width * locator.mLocationActual.x - dotBitmp.width / 2
+                            var transy = imgDy + mHouseBitmap!!.height * locator.mLocationActual.y - dotBitmp.height / 2
+                            matrix.preTranslate(transx, transy)
                             canvas.drawBitmap(dotBitmp, matrix, paint)
                         }
 

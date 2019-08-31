@@ -29,6 +29,7 @@ import com.mercku.ipsdemo.model.FreeRoom
 import com.mercku.ipsdemo.model.IntersectionArea
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.Node
+import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.util.MathUtil
 import com.mercku.ipsdemo.view.BaseEditView.Companion.DEFAULT_DOT_RADIUS
 import com.mercku.ipsdemo.view.BaseEditView.Companion.NONE_TOUCH
@@ -81,7 +82,7 @@ class MyLocatorView : BaseEditView {
                 var bitmap = BitmapFactory.decodeStream(
                         mContext.getContentResolver().openInputStream(uri))
                 android.util.Log.d("ryq", "drawHouseDetail  bitmap=" + bitmap)
-                mHouseBitmap = Bitmap.createBitmap(bitmap)
+                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
             }
 
             var imgMatrix = Matrix()
@@ -97,10 +98,13 @@ class MyLocatorView : BaseEditView {
                 var dotBitmp = Bitmap.createBitmap(temp);
                 while (index < mHouseDetail!!.mData!!.size) {
                     var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                    if (locator.mIsSelected || locator.mIsAdded) {
 
                         var matrix = Matrix()
-                        matrix.preTranslate(imgDx + mHouseBitmap!!.width * locator.mLocationActual.x, imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+                        var transx = imgDx + mHouseBitmap!!.width * locator.mLocationActual.x - dotBitmp.width / 2
+                        var transy = imgDy + mHouseBitmap!!.height * locator.mLocationActual.y - dotBitmp.height / 2
+
+                        matrix.preTranslate(transx, transy)
                         canvas.drawBitmap(dotBitmp, matrix, paint)
                     }
                     index++
@@ -120,15 +124,14 @@ class MyLocatorView : BaseEditView {
                     var curY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
                     var curDisY = curY * unit
 
-                    if (locator.mLocationActual.x > 0 && locator.mLocationActual.y > 0) {
+                    if (locator.mIsSelected || locator.mIsAdded) {
                         var nextIndex = index + 1
                         while (nextIndex < mHouseDetail!!.mData!!.size) {
                             var nextLocator = mHouseDetail!!.mData!![nextIndex]
                             android.util.Log.d("ryq", "drawHouseDetail  "
                                     + " nextLocator.mLocationActual.x=" + nextLocator.mLocationActual.x
                                     + " nextLocator.mLocationActual.y=" + nextLocator.mLocationActual.y)
-                            if (nextLocator.mLocationActual.x > 0 && nextLocator.mLocationActual.y > 0) {
-
+                            if (locator.mIsSelected || locator.mIsAdded) {
                                 var nextX = (imgDx + mHouseBitmap!!.width * nextLocator.mLocationActual.x)
                                 var nextDisX = nextX * unit
                                 var nextY = (imgDy + mHouseBitmap!!.height * nextLocator.mLocationActual.y)
@@ -136,11 +139,10 @@ class MyLocatorView : BaseEditView {
                                 android.util.Log.d("ryq", "drawHouseDetail  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
                                 var dis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
                                 var pixDis = Math.sqrt(((curX - nextX) * (curX - nextX) + (curY - nextY) * (curY - nextY)).toDouble())
-                                canvas.drawLine(curX + temp.width / 2, curY + temp.height / 2, nextX + temp.width / 2, nextY + temp.height / 2, mLinePaint)
+                                canvas.drawLine(curX, curY, nextX, nextY, mLinePaint)
                                 var path = Path()
                                 path.moveTo(curX, curY)
                                 path.lineTo(nextX, nextY)
-
 
                                 android.util.Log.d("ryq", "drawHouseDetail  dis=" + dis)
                                 var disStr: String = String.format("%.1f", dis)

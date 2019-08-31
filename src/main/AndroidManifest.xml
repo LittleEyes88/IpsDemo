@@ -33,7 +33,9 @@
         <activity
             android:name=".activity.SearchResultActivity"
             android:label="@string/my_family" />
-        <activity android:name=".activity.SurfaceViewActivity" />
+        <activity
+            android:name=".activity.SurfaceViewActivity"
+            android:label="@string/set_scale" />
     </application>
 
 </manifest>
