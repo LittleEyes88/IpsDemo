@@ -10,12 +10,20 @@
     android:paddingEnd="@dimen/mercku_margin_twenty"
     tools:context=".activity.MainActivity">
 
+    <include
+        layout="@layout/layout_no_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_new_house"
         android:layout_width="match_parent"
         android:layout_height="@dimen/mercku_view_height_sixty"
         android:background="@drawable/bg_create_new_house"
-        android:onClick="onClickAddNewHouse"
+        android:onClick="onClickAdd"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -46,13 +54,4 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <ViewStub
-        android:id="@+id/layout_no_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:inflatedId="@+id/inflated"
-        android:layout="@layout/layout_no_content"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

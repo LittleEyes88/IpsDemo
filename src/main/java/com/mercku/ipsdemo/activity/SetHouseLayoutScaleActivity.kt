@@ -9,6 +9,7 @@ import com.mercku.base.ui.BaseContentActivity
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.util.CacheUtil
 
 /**
  * Created by yanqiong.ran on 2019-08-29.
@@ -45,8 +46,11 @@ class SetHouseLayoutScaleActivity : BaseContentActivity() {
     override fun onClickRightTitleView() {
         var width = mCustomView.getActualBitmapWidth()
         mIpsHouse.mBitmapActualWidth = width
+        CacheUtil.saveNewHouse(mIpsHouse, this)
+
         var intent = Intent(this, HouseLayoutDetailActivity::class.java)
         intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)
         startActivity(intent)
     }
+
 }

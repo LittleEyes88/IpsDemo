@@ -17,7 +17,7 @@ import com.mercku.ipsdemo.listener.OnItemClickListener
 import com.mercku.ipsdemo.model.IpsHouse
 import java.io.File
 
-class HouseLayoutAdapter(val mContext: Context, private val mData: ArrayList<IpsHouse>,
+class HouseLayoutAdapter(val mContext: Context, var mData: ArrayList<IpsHouse>,
                          val mOnItemClickListener: OnItemClickListener)
     : RecyclerView.Adapter<HouseLayoutAdapter.HouseViewHolder>() {
 

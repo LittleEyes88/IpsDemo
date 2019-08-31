@@ -6,10 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.mercku.base.ui.BaseContentActivity
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.util.FileUtil
@@ -18,17 +21,19 @@ import com.mercku.ipsdemo.adapter.HouseLayoutAdapter
 import com.mercku.ipsdemo.constants.RequestConstants
 import com.mercku.ipsdemo.listener.OnItemClickListener
 import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.util.AcacheUtil
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 
 
 class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks, OnItemClickListener {
 
+    private lateinit var mHouseLayoutAdapter: HouseLayoutAdapter
     private lateinit var mData: ArrayList<IpsHouse>
     private lateinit var mAddNewHouseLayout: View
     private lateinit var mRecyclerView: RecyclerView
-    private var mAddTextView: TextView? = null
-    private var mNoContentLayout: ViewStub? = null
+    private lateinit var mAddTextView: TextView
+    private lateinit var mNoContentLayout: ViewGroup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +42,33 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks,
         mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mData = ArrayList<IpsHouse>()
-        mRecyclerView.adapter = HouseLayoutAdapter(this, mData, this)
+
+        mHouseLayoutAdapter = HouseLayoutAdapter(this, mData, this)
+
+        mRecyclerView.adapter = mHouseLayoutAdapter
         mAddNewHouseLayout = findViewById<View>(R.id.layout_new_house)
 
+        mNoContentLayout = findViewById(R.id.layout_no_content)
+        mAddTextView = mNoContentLayout.findViewById<TextView>(R.id.text_add)
+        mAddTextView.setOnClickListener { onClickAdd(it) }
         showNoContentLayout(mData.size <= 0)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        var acache = AcacheUtil.get(this)
+        var cachedData: String? = acache.getAsString(ExtraConstants.EXTRA_HOUSE_LIST)
+        if (cachedData != null) {
+            var houseList = Gson().fromJson<ArrayList<IpsHouse>>(cachedData, object : TypeToken<ArrayList<IpsHouse>>() {}.type)
+            if (!houseList.isEmpty()) {
+                mData = houseList
+                mHouseLayoutAdapter.mData = mData
+                mHouseLayoutAdapter.notifyDataSetChanged()
+                showNoContentLayout(mData.size <= 0)
+            }
+
+        }
+
     }
 
     override fun onItemClick(position: Int, viewId: Int) {
@@ -64,23 +92,14 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks,
 
     fun showNoContentLayout(isShow: Boolean) {
         if (isShow) {
-            if (mNoContentLayout == null) {
-                var viewstub = findViewById<ViewStub>(R.id.layout_no_content)
-                viewstub.inflate()
 
-                mNoContentLayout = viewstub.findViewById(R.id.inflated)
-                mAddTextView = mNoContentLayout?.findViewById<TextView>(R.id.text_add)
-                mAddTextView?.setOnClickListener { onClickAdd(it) }
-            } else {
-                mNoContentLayout!!.visibility = View.VISIBLE
-            }
+            mNoContentLayout!!.visibility = View.VISIBLE
             mRecyclerView.visibility = View.GONE
-            mAddNewHouseLayout.visibility = View.VISIBLE
+            mAddNewHouseLayout.visibility = View.GONE
         } else {
             mRecyclerView.visibility = View.VISIBLE
             mAddNewHouseLayout.visibility = View.VISIBLE
-
-            mNoContentLayout?.visibility = View.GONE
+            mNoContentLayout.visibility = View.GONE
         }
 
     }
