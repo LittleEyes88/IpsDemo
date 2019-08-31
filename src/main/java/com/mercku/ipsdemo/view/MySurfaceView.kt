@@ -19,26 +19,16 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-
         if (null != mDrawThread) {
-
             mDrawThread!!.stopThread();
-
         }
-
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
-
-
         if (null == mDrawThread) {
-
             mDrawThread = DrawThread(this@MySurfaceView)
-
             mDrawThread!!.start()
-
         }
-
     }
 
     private var mHolder: SurfaceHolder? = null
@@ -133,41 +123,25 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
         }
 
         public override fun run() {
-
             while (isRunning) {
-
                 var canvas: Canvas? = null
-
                 try {
-
                     mReference.get()?.mHolder?.let {
                         synchronized(it) {
-
                             canvas = mReference.get()!!.mHolder!!.lockCanvas();
                             if (canvas == null)
 
                                 return
                             canvas!!.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
                             mReference.get()!!.drawBackground(canvas!!)
-
+                            mReference.get()!!.mHolder!!.unlockCanvasAndPost(canvas)
                         }
                     }
-
                 } catch (e: Exception) {
-
                     e.printStackTrace();
-
-                } finally {
-                    mReference.get()?.mHolder?.let {
-                        mReference.get()!!.mHolder!!.unlockCanvasAndPost(canvas)
-                    }
                 }
-
             }
-
-
         }
-
     }
 
 }

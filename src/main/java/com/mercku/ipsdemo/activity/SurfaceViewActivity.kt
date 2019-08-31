@@ -5,19 +5,21 @@ import com.mercku.base.ui.BaseContentActivity
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.view.MySurfaceView
 import android.view.SurfaceView
+import com.mercku.ipsdemo.listener.OnViewTouchListener
 
 
 /**
  * Created by yanqiong.ran on 2019-08-31.
  */
-class SurfaceViewActivity:BaseContentActivity(){
+class SurfaceViewActivity : BaseContentActivity() {
     private lateinit var mSurfaceView: SurfaceView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-         setContentView(R.layout.activity_surface_view)
-        //mSurfaceView=findViewById(R.id.layout_surface_view)
-       // mSurfaceView.setZOrderOnTop(true);
+        setContentView(R.layout.activity_surface_view)
+        mSurfaceView = findViewById(R.id.layout_surface_view)
+        mSurfaceView.setOnTouchListener(OnViewTouchListener(mSurfaceView))
+        // mSurfaceView.setZOrderOnTop(true);
         //mSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
     }
 }
