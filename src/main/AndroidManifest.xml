@@ -33,6 +33,7 @@
         <activity
             android:name=".activity.SearchResultActivity"
             android:label="@string/my_family" />
+        <activity android:name=".activity.SurfaceViewActivity" />
     </application>
 
 </manifest>
