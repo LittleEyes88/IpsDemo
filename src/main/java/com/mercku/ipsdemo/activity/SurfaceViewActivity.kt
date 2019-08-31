@@ -26,7 +26,7 @@ import java.io.File
  */
 class SurfaceViewActivity : BaseContentActivity() {
 
-    private lateinit var mSurfaceView: SurfaceView
+    private lateinit var mSurfaceView: MySurfaceView
     private var mSurfaceTouchListener: OnViewTouchListener? = null
     private lateinit var mIpsHouse: IpsHouse
     private lateinit var mHintImageView: ImageView
@@ -44,8 +44,7 @@ class SurfaceViewActivity : BaseContentActivity() {
 
         mSurfaceView = findViewById(R.id.layout_surface_view)
         mSurfaceTouchListener = OnViewTouchListener(mSurfaceView)
-        mSurfaceView.setOnTouchListener(mSurfaceTouchListener)
-
+        mSurfaceView.mOnViewTouchListener = mSurfaceTouchListener
         mIpsHouse = intent.getParcelableExtra<IpsHouse>(ExtraConstants.EXTRA_HOUSE_DETAIL)
         if (mIpsHouse == null)
             return

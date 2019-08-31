@@ -3,10 +3,12 @@ package com.mercku.ipsdemo.view
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.mercku.ipsdemo.MyMatrix
 import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.listener.OnViewTouchListener
 import java.lang.ref.WeakReference
 
 
@@ -14,6 +16,8 @@ import java.lang.ref.WeakReference
  * Created by yanqiong.ran on 2019-08-31.
  */
 class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
+
+    var mOnViewTouchListener: OnViewTouchListener? = null
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
 
     }
@@ -67,9 +71,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
          * bitmap: 原图像
          * pixInterval: 网格线的横竖间隔，单位:像素
          */
-        val pixInterval = (BaseEditView.DEFAULT_PIX_INTERVAL
-                /** mTotalScaled*/
-                ).toInt()
+        val pixInterval = BaseEditView.DEFAULT_PIX_INTERVAL
         BaseEditView.BITMAP_WIDTH = mContext.resources.displayMetrics.widthPixels * 2
         BaseEditView.BITMAP_HEIGHT = mContext.resources.displayMetrics.heightPixels * 2
         val bitmap = Bitmap.createBitmap(BaseEditView.BITMAP_WIDTH, BaseEditView.BITMAP_HEIGHT, Bitmap.Config.ARGB_8888)  //很重要
@@ -88,13 +90,26 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
         for (i in 0 until bitmap.width / pixInterval) {
             bimapCanvas.drawLine((i * pixInterval).toFloat(), 0f, (i * pixInterval).toFloat(), bitmap.height.toFloat(), mGridPaint)
         }
-        //android.util.Log.d("ryq", " bitmap1 getTranslationX=" + getTranslationX() + " getTranslationY=" + getTranslationY()
-        //        + " BITMAP_WIDTH=" + BITMAP_WIDTH + " BITMAP_HEIGHT=" + BITMAP_HEIGHT);
-        // android.util.Log.d("ryq", "drawBackground  mScaled=$mScaled")
+        android.util.Log.d("ryq", " bitmap1 getTranslationX=" + getTranslationX()
+                + " getTranslationY=" + getTranslationY()
+                + " getTotalDy=" + mOnViewTouchListener?.getTotalDy()
+                + " getTotalDx=" + mOnViewTouchListener?.getTotalDx()
+                + " mOnViewTouchListener?.getTotalScaled()=" + mOnViewTouchListener?.getTotalScaled()
+                + " bitmap.width=" + bitmap.width + " bitmap.height=" + bitmap.height);
+        android.util.Log.d("ryq", "drawBackground  scrollX=$scrollX" + scrollX + " scaleY=" + scaleY + " scaleX=" + scaleX)
 
-        val myMatrix = MyMatrix.translationMatrix(-bitmap.width / 2.0f /*+ mScrolledX*/, -bitmap.height / 2.0f/* + mScrolledY*/)
+        val myMatrix = MyMatrix.translationMatrix(-bitmap.width / 2.0f + scrollX, -bitmap.height / 2.0f + scrollY)
         canvas.drawBitmap(bitmap, myMatrix, paintBmp)
         return canvas
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        mOnViewTouchListener?.let {
+            if (event != null) {
+                return mOnViewTouchListener!!.onTouch(this, event)
+            }
+        }
+        return super.onTouchEvent(event)
     }
 
     private class DrawThread : Thread {

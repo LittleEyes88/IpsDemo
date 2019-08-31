@@ -257,7 +257,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             android.util.Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
             // calculateEveryDotLocation()
             var house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
-            var intent = Intent(this, SetHouseLayoutScaleActivity::class.java)
+            var intent = Intent(this, SurfaceViewActivity::class.java)
             intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
             startActivity(intent)
         }
