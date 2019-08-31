@@ -16,13 +16,26 @@ object CacheUtil {
         var acache = AcacheUtil.get(context);
         var cachedData: String? = acache.getAsString(ExtraConstants.EXTRA_HOUSE_LIST)
         var houseList: ArrayList<IpsHouse>? = null
+        var hasExited = false
         if (cachedData != null) {
             houseList = Gson().fromJson<ArrayList<IpsHouse>>(cachedData, object : TypeToken<ArrayList<IpsHouse>>() {}.type)
+            var index = 0
+
+            while (index < houseList.size) {
+                if (ipsHouse.mId.equals(houseList[index].mId)) {
+                    houseList[index] = ipsHouse
+                    hasExited = true
+                    break;
+                }
+                index++
+            }
         }
         if (houseList == null || houseList.isEmpty()) {
             houseList = ArrayList<IpsHouse>()
         }
-        houseList.add(ipsHouse)
+        if (!hasExited) {
+            houseList.add(ipsHouse)
+        }
         acache.put(ExtraConstants.EXTRA_HOUSE_LIST, Gson().toJson(houseList))
     }
 }
