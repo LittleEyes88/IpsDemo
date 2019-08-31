@@ -23,8 +23,8 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
      * 用于记录开始时候的坐标位置
      */
     private val mStartPoint = PointF()
-    private var mTotalDx = 0f
-    private var mTotalDy = 0f
+    private var mTotalDx = 0f//每次移动的水平距离
+    private var mTotalDy = 0f//每次移动的垂直距离
     /**
      * 手指点击屏幕的触摸事件
      */
@@ -35,6 +35,8 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
             MotionEvent.ACTION_DOWN -> {
                 mMode = MODE_DRAG
                 // 记录ImageView当前的移动位置
+                mTotalDx = 0f
+                mTotalDy = 0f
                 mStartPoint.set(event.x, event.y)
                 var locatorTextView = mTargetView.findViewById<TextView>(R.id.text_locator)
                 if (locatorTextView != null) {

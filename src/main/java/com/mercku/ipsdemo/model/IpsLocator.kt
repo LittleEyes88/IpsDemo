@@ -8,7 +8,7 @@ data class IpsLocator(var mName: String?, var mType: String, var mId: String) : 
    // var mLocation: PointF = PointF(-1f, -1f)
     var mIsSelected: Boolean = false
     var mIsAdded: Boolean = false
-    var mLocationActual: PointF = PointF(0.5f, 0.5f)
+    var mLocationActual: PointF = PointF(0.5f, 0.5f)//中心点相对于背景图的横纵向的比例
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),

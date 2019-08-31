@@ -17,6 +17,7 @@ import com.mercku.ipsdemo.listener.DotTouchListener
 import com.mercku.ipsdemo.listener.OnViewTouchListener
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.IpsLocator
+import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.util.CacheUtil
 import com.mercku.ipsdemo.view.BaseEditView
 import java.io.File
@@ -52,8 +53,6 @@ class SurfaceViewActivity : BaseContentActivity() {
         mHouseLayout = findViewById(R.id.house_layout)
         mHouseImageView = findViewById<ImageView>(R.id.image_house)
         initHouseLayout(mIpsHouse)
-        android.util.Log.d("ryq", "SetHouseLayoutScaleActivity  mIpsHouse.mImageFilePath=" + mIpsHouse.mImageFilePath)
-        //mCustomView.setImageBitmap(mIpsHouse.mBitmap)
         mHintImageView = findViewById(R.id.img_hint)
         mHintImageView.setOnClickListener {
             mHintTextView.visibility = if (mHintTextView.visibility == View.GONE) {
@@ -79,13 +78,13 @@ class SurfaceViewActivity : BaseContentActivity() {
     }
 
     private fun initHouseLayout(ipsHouse: IpsHouse) {
-        android.util.Log.d("ryq", "AddLocatorActivity  ipsHouse.mImageFilePath=" + ipsHouse.mImageFilePath)
+        android.util.Log.d("ryq", "SurfaceViewActivity  ipsHouse.mImageFilePath=" + ipsHouse.mImageFilePath)
         var file = File(ipsHouse.mImageFilePath)
         if (file.exists()) {
             var uri = Uri.fromFile(file)
             mBitmap = BitmapFactory.decodeStream(
                     getContentResolver().openInputStream(uri))
-            android.util.Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
+            android.util.Log.d("ryq", "SurfaceViewActivity mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
             mHouseImageView.setImageBitmap(mBitmap)
         }
 
@@ -93,31 +92,31 @@ class SurfaceViewActivity : BaseContentActivity() {
             override fun onGlobalLayout() {
 
                 mBitmap?.let {
-                    if (mBitmap!!.width >= mBitmap!!.height) {
+                    var scale = BitmapUtil.getScaleAfterResizeBitmap(mBitmap!!, mHouseImageView.width, mHouseImageView.height)
+                    mInitialHeight = mBitmap!!.height.toFloat() * scale
+                    mInitialWidth = mBitmap!!.width * scale
+                }
 
-                        mInitialWidth = mHouseImageView.width.toFloat()
-                        mInitialHeight = mInitialWidth / mBitmap!!.width * mBitmap!!.height
-                    } else {
-                        mInitialHeight = mHouseImageView.height.toFloat()
-                        mInitialWidth = mInitialHeight / mBitmap!!.height * mBitmap!!.width
+                android.util.Log.d("ryq", "SurfaceViewActivity mInitialWidth=" + mInitialWidth
+                        + " mInitialHeight=" + mInitialHeight
+                        + " mHouseImageView.width=" + mHouseImageView.width
+                        + " mHouseImageView.height=" + mHouseImageView.height)
+
+                mHouseImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                /**注意！！
+                 * 必须要等houseimage 宽高量出来以后才能计算出点的位置
+                 */
+                if (ipsHouse !== null && ipsHouse!!.mData != null) {
+                    var locator: IpsLocator
+                    for (locator in ipsHouse!!.mData!!) {
+                        if (locator.mIsAdded || locator.mIsSelected) {
+                            addDotToHouse(locator)
+                        }
                     }
                 }
-                var imageLayoutHeight = mHouseImageView.height
-                var imageLayoutWidth = mHouseImageView.width
-                android.util.Log.d("ryq", " imageLayoutWidth=" + imageLayoutWidth + " imageLayoutHeight=" + imageLayoutHeight)
-
-                mHouseImageView.getViewTreeObserver()
-                        .removeOnGlobalLayoutListener(this)
             }
         })
-        if (ipsHouse !== null && ipsHouse!!.mData != null) {
-            var locator: IpsLocator
-            for (locator in ipsHouse!!.mData!!) {
-                if (locator.mIsAdded || locator.mIsSelected) {
-                    addDotToHouse(locator)
-                }
-            }
-        }
+
     }
 
     private fun addDotToHouse(locator: IpsLocator) {
@@ -130,8 +129,9 @@ class SurfaceViewActivity : BaseContentActivity() {
         locatorTextView.text = locator.mName
 
         dotView.setTag(locator)
-        dotView.x = mInitialWidth * locator.mLocationActual.x + mHouseImageView.width / 2 - mInitialWidth / 2
-        dotView.y = mInitialHeight * locator.mLocationActual.y + mHouseImageView.height / 2 - mInitialHeight / 2
+        dotView.measure(0, 0)
+        dotView.x = mInitialWidth * locator.mLocationActual.x + mHouseLayout.width / 2 - mInitialWidth / 2 - dotView.measuredWidth / 2.0f
+        dotView.y = mInitialHeight * locator.mLocationActual.y + mHouseLayout.height / 2 - mInitialHeight / 2 - dotView.measuredHeight / 2.0f
         mHouseLayout.addView(dotView, mHouseLayout.childCount)
         android.util.Log.d("ryq", " locator.mLocationActual.x=" + locator.mLocationActual.x
                 + " locator.mLocationActual.y=" + locator.mLocationActual.y)

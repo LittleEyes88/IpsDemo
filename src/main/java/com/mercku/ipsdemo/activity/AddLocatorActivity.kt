@@ -24,6 +24,7 @@ import com.mercku.ipsdemo.listener.OnDotMoveFinishListener
 import com.mercku.ipsdemo.listener.OnItemClickListener
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.IpsLocator
+import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.view.BaseEditView
 import java.io.File
 
@@ -85,48 +86,31 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             override fun onGlobalLayout() {
 
                 mBitmap?.let {
-                    if (mBitmap!!.width >= mBitmap!!.height) {
-
-                        mInitialWidth = mHouseImageView.width.toFloat()
-                        mInitialHeight = mInitialWidth / mBitmap!!.width * mBitmap!!.height
-                    } else {
-                        mInitialHeight = mHouseImageView.height.toFloat()
-                        mInitialWidth = mInitialHeight / mBitmap!!.height * mBitmap!!.width
-                    }
+                    var scale = BitmapUtil.getScaleAfterResizeBitmap(mBitmap!!, mHouseImageView.width, mHouseImageView.height)
+                    mInitialHeight = mBitmap!!.height.toFloat() * scale
+                    mInitialWidth = mBitmap!!.width * scale
                 }
-                var imageLayoutHeight = mHouseImageView.height
-                var imageLayoutWidth = mHouseImageView.width
-                android.util.Log.d("ryq", " imageLayoutWidth=" + imageLayoutWidth + " imageLayoutHeight=" + imageLayoutHeight)
 
-                /* var matrix = mHouseImageView.imageMatrix
-                 if (mBitmap != null) {
-                     mBitmapTransX = (houseLayoutWidth / 2).toFloat() - mBitmap!!.width / 2
-                     mBitmapTransY = (houseLayoutHeight / 2).toFloat() - mBitmap!!.height / 2
+                android.util.Log.d("ryq", " mInitialWidth=" + mInitialWidth
+                        + " mInitialHeight=" + mInitialHeight
+                        + " mHouseImageView.width=" + mHouseImageView.width
+                        + " mHouseImageView.height=" + mHouseImageView.height)
 
-                 } else {
-                     mBitmapTransX = (houseLayoutWidth / 2).toFloat()
-                     mBitmapTransY = (houseLayoutHeight / 2).toFloat()
-                 }*/
-                //matrix.postTranslate(mBitmapTransX, mBitmapTransY)
-                //mHouseImageView.imageMatrix = matrix
-                // mHouseImageView.translationX = mBitmapTransX
-                // mHouseImageView.translationY = mBitmapTransY
-
-                mHouseImageView.getViewTreeObserver()
-                        .removeOnGlobalLayoutListener(this)
+                mHouseImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
             }
         })
-        mHouseLayout.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
+        mHouseLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+                object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
 
-                var houseLayoutHeight = mHouseLayout.height
-                var houseLayoutWidth = mHouseLayout.width
-                android.util.Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
+                        var houseLayoutHeight = mHouseLayout.height
+                        var houseLayoutWidth = mHouseLayout.width
+                        android.util.Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
 
-                mHouseLayout.getViewTreeObserver()
-                        .removeOnGlobalLayoutListener(this)
-            }
-        })
+                        mHouseLayout.getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this)
+                    }
+                })
 
     }
 
@@ -200,11 +184,13 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
         dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator.mId, this))
         android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
-                + " mHouseImageView.translationX =" + mHouseImageView.translationX
-                + " mHouseImageView.translationY =" + mHouseImageView.translationY
                 + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
-        android.util.Log.d("ryq", " measuredWidth=" + mHouseImageView.measuredWidth + " measuredHeight=" + mHouseImageView.measuredHeight)
+        android.util.Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
+                + " mHouseImageView.measuredHeight=" + mHouseImageView.measuredHeight)
         dotView.setTag(locator)
+        dotView.measure(0,0)
+        dotView.x = mHouseLayout.width / 2.0f - dotView.measuredWidth / 2.0f
+        dotView.y = mHouseLayout.height / 2.0f - dotView.measuredHeight / 2.0f
         mHouseLayout.addView(dotView, mHouseLayout.childCount)
         android.util.Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
         android.util.Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
@@ -265,7 +251,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
     }
 
-    private fun calculateEveryDotLocation() {
+/*    private fun calculateEveryDotLocation() {
 
 
         var scaled = mImageTouchListener.getTotalScaled()
@@ -314,5 +300,5 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         }
 
 
-    }
+    }*/
 }

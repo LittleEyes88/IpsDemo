@@ -22,11 +22,32 @@ object BitmapUtil {
             }
             var matrix = Matrix()
             matrix.postScale(scale, scale)
-            var res = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-            return res;
+            var res = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true)
+            return res
 
         } else {
-            return null;
+            return null
+        }
+    }
+
+    public fun getScaleAfterResizeBitmap(bitmap: Bitmap, w: Int, h: Int): Float {
+        var scale = 1.0f
+        if (bitmap != null) {
+            var width = bitmap.getWidth()
+            var height = bitmap.getHeight()
+            var newWidth = w
+            var newHeight = h
+            var scaleWidth = newWidth.toFloat() / width
+            var scaleHeight = newHeight.toFloat() / height
+            scale = if (scaleWidth < scaleHeight) {
+                scaleWidth
+            } else {
+                scaleHeight
+            }
+            return scale
+
+        } else {
+            return scale
         }
     }
 
