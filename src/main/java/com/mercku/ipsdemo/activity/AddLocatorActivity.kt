@@ -212,20 +212,20 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         android.util.Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
     }
 
-    override fun onFinish(x: Float, y: Float, id: String, targetView: View) {
+    override fun onFinish(dx: Float, dy: Float, id: String, targetView: View) {
         if (mBitmap != null) {
 
-            android.util.Log.d("ryq", "onFinish x=" + x + " y=" + y
+            android.util.Log.d("ryq", "onFinish "
                     + " mHouseImageView!!.left=" + mHouseImageView!!.left
                     + " mHouseImageView!!.right=" + mHouseImageView!!.right
                     + " mHouseImageView!!.top=" + mHouseImageView!!.top
                     + " mHouseImageView!!.bottom=" + mHouseImageView!!.bottom)
             for (ipsLocator in mData) {
                 if (ipsLocator.mId.equals(id)) {
-                    if (ipsLocator.mLocation.x < mHouseImageView!!.left
-                            || ipsLocator.mLocation.x > mHouseImageView!!.right
-                            || ipsLocator.mLocation.y < mHouseImageView!!.top
-                            || ipsLocator.mLocation.y > mHouseImageView!!.bottom) {
+                    if (targetView.x < mHouseImageView!!.left
+                            || targetView.x > mHouseImageView!!.right
+                            || targetView.y < mHouseImageView!!.top
+                            || targetView.y > mHouseImageView!!.bottom) {
                         Toast.makeText(this, getString(R.string.move_locator_in_house), Toast.LENGTH_LONG).show()
                     } else {
 
@@ -235,11 +235,11 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                         locatorImageView.visibility = View.INVISIBLE
 
 
-                        Log.d(BaseEditView.TAG, "onFinish x=" + x + " y=" + y
+                        Log.d(BaseEditView.TAG, "onFinish dx=" + dx + " dy=" + dy
                                 + " targetView.width =" + targetView.width
                                 + " targetView.height =" + targetView.height)
-                        //  ipsLocator.mLocation.x = x
-                        // ipsLocator.mLocation.y = y
+                        ipsLocator.mLocationActual.x += dx / mHouseImageView.width * mImageTouchListener.getTotalScaled()
+                        ipsLocator.mLocationActual.y += dy / mHouseImageView.height * mImageTouchListener.getTotalScaled()
                     }
 
                 }

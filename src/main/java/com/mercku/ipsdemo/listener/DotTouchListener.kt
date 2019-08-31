@@ -23,7 +23,8 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
      * 用于记录开始时候的坐标位置
      */
     private val mStartPoint = PointF()
-
+    private var mTotalDx = 0f
+    private var mTotalDy = 0f
     /**
      * 手指点击屏幕的触摸事件
      */
@@ -46,6 +47,8 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
                 if (mMode == MODE_DRAG) {
                     val dx = event.x - mStartPoint.x // 得到x轴的移动距离
                     val dy = event.y - mStartPoint.y // 得到x轴的移动距离
+                    mTotalDx += dx
+                    mTotalDy += dy
                     // 在没有移动之前的位置上进行移动
                     mTargetView.translationX += dx
                     mTargetView.translationY += dy
@@ -59,7 +62,7 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
             MotionEvent.ACTION_POINTER_DOWN -> {
                 mMode = 0
                 mTargetView.isSelected = false
-                mOnDotMoveFinishListener.onFinish(mTargetView.x, mTargetView.y, mId, mTargetView)
+                mOnDotMoveFinishListener.onFinish(mTotalDx, mTotalDy, mId, mTargetView)
             }
         }
         return true
