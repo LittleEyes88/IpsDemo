@@ -8,18 +8,19 @@
         android:id="@+id/house_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/mercku_text_gray"
         app:layout_constraintBottom_toTopOf="@+id/recycler_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/image_house"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:foregroundGravity="center"
-            android:scaleType="matrix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/img_house_plan"
+            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

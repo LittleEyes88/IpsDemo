@@ -116,7 +116,7 @@ class MyStickerView : BaseEditView {
                 var curX = width / 2.0f
                 var curDisX = curX * unit
                 var curY = center.cy
-                var curDisY = height / 2.0f
+                var curDisY = curY * unit
 
                 //draw lines from dot to sticker
                 index = 0

@@ -32,6 +32,9 @@ import java.io.File
  */
 class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMoveFinishListener {
 
+    private var mInitialWidth: Float = 0f
+
+    private var mInitialHeight: Float = 0f
     private lateinit var mImageTouchListener: ImageTouchListener
     private var mBitmapTransX: Float = 0f
     private var mBitmapTransY: Float = 0f
@@ -72,31 +75,55 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             var uri = Uri.fromFile(file)
             mBitmap = BitmapFactory.decodeStream(
                     getContentResolver().openInputStream(uri))
-
+            android.util.Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
             mHouseImageView.setImageBitmap(mBitmap)
         }
-        mImageTouchListener = ImageTouchListener(mHouseImageView)
+
+        mImageTouchListener = ImageTouchListener(mHouseLayout)
         mHouseImageView.setOnTouchListener(mImageTouchListener)
         mHouseImageView.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
-                var houseLayoutHeight = mHouseImageView.height
-                var houseLayoutWidth = mHouseImageView.width
-                android.util.Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight)
-                android.util.Log.d("ryq", " houseLayoutWidth=" + houseLayoutWidth)
-                var matrix = mHouseImageView.imageMatrix
-                if (mBitmap != null) {
-                    mBitmapTransX = (houseLayoutWidth / 2).toFloat() - mBitmap!!.width / 2
-                    mBitmapTransY = (houseLayoutHeight / 2).toFloat() - mBitmap!!.height / 2
-                    android.util.Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
-                } else {
-                    mBitmapTransX = (houseLayoutWidth / 2).toFloat()
-                    mBitmapTransY = (houseLayoutHeight / 2).toFloat()
+                mBitmap?.let {
+                    if (mBitmap!!.width >= mBitmap!!.height) {
+
+                        mInitialWidth = mHouseImageView.width.toFloat()
+                        mInitialHeight = mInitialWidth / mBitmap!!.width * mBitmap!!.height
+                    } else {
+                        mInitialHeight = mHouseImageView.height.toFloat()
+                        mInitialWidth = mInitialHeight / mBitmap!!.height * mBitmap!!.width
+                    }
                 }
-                matrix.postTranslate(mBitmapTransX, mBitmapTransY)
-                mHouseImageView.imageMatrix = matrix
+                var imageLayoutHeight = mHouseImageView.height
+                var imageLayoutWidth = mHouseImageView.width
+                android.util.Log.d("ryq", " imageLayoutWidth=" + imageLayoutWidth + " imageLayoutHeight=" + imageLayoutHeight)
+
+                /* var matrix = mHouseImageView.imageMatrix
+                 if (mBitmap != null) {
+                     mBitmapTransX = (houseLayoutWidth / 2).toFloat() - mBitmap!!.width / 2
+                     mBitmapTransY = (houseLayoutHeight / 2).toFloat() - mBitmap!!.height / 2
+
+                 } else {
+                     mBitmapTransX = (houseLayoutWidth / 2).toFloat()
+                     mBitmapTransY = (houseLayoutHeight / 2).toFloat()
+                 }*/
+                //matrix.postTranslate(mBitmapTransX, mBitmapTransY)
+                //mHouseImageView.imageMatrix = matrix
+                // mHouseImageView.translationX = mBitmapTransX
+                // mHouseImageView.translationY = mBitmapTransY
 
                 mHouseImageView.getViewTreeObserver()
+                        .removeOnGlobalLayoutListener(this)
+            }
+        })
+        mHouseLayout.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+
+                var houseLayoutHeight = mHouseLayout.height
+                var houseLayoutWidth = mHouseLayout.width
+                android.util.Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
+
+                mHouseLayout.getViewTreeObserver()
                         .removeOnGlobalLayoutListener(this)
             }
         })
@@ -170,12 +197,19 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             }
         }
         locatorTextView.text = locator.mName
-        locator.mLocation.y = (mHouseLayout.height / 2).toFloat()
-        locator.mLocation.x = (mHouseLayout.width / 2).toFloat()
+        locator.mLocation.y = mHouseLayout.width / 2.0f
+        locator.mLocation.x = mHouseLayout.height / 2.0f
+
         dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator.mId, this))
-        android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount)
+        android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
+                + " mHouseImageView.translationX =" + mHouseImageView.translationX
+                + " mHouseImageView.translationY =" + mHouseImageView.translationY
+                + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
+        android.util.Log.d("ryq", " measuredWidth=" + mHouseImageView.measuredWidth + " measuredHeight=" + mHouseImageView.measuredHeight)
         dotView.setTag(locator)
         mHouseLayout.addView(dotView, mHouseLayout.childCount)
+        android.util.Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
+        android.util.Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
     }
 
     override fun onFinish(x: Float, y: Float, id: String, targetView: View) {
@@ -204,8 +238,8 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                         Log.d(BaseEditView.TAG, "onFinish x=" + x + " y=" + y
                                 + " targetView.width =" + targetView.width
                                 + " targetView.height =" + targetView.height)
-                        ipsLocator.mLocation.x = x
-                        ipsLocator.mLocation.y = y
+                        //  ipsLocator.mLocation.x = x
+                        // ipsLocator.mLocation.y = y
                     }
 
                 }
@@ -233,12 +267,15 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
 
         var scaled = mImageTouchListener.getTotalScaled()
-
+        android.util.Log.d("ryq", "  mHouseImageView.translationX=" + mHouseImageView.translationX)
+        android.util.Log.d("ryq", " mHouseImageView.translationY=" + mHouseImageView.translationY)
+        android.util.Log.d("ryq", "  mHouseImageView.scaleX=" + mHouseImageView.scaleX)
+        android.util.Log.d("ryq", " mHouseImageView.scaleY=" + mHouseImageView.scaleY)
         Log.d(BaseEditView.TAG, "onFinish scaled =" + scaled)
         var index = 0
         while (index < mData.size) {
             var ipsLocator = mData[index]
-            if (ipsLocator.mLocation.x > 0 && ipsLocator.mLocation.y > 0) {
+            if (ipsLocator.mLocationActual.x > 0 && ipsLocator.mLocationActual.y > 0) {
                 var curDotLayoutView = mHouseLayout.getChildAt(index + 1)
                 var viewIndex = 0
 
@@ -255,8 +292,14 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                             }
 
                             //左上角的坐标
-                            ipsLocator.mLocationActual.x = (ipsLocator.mLocation.x / scaled + curDotLayoutView!!.width / 2 - mBitmapTransX - radius) / mBitmap!!.width
-                            ipsLocator.mLocationActual.y = (ipsLocator.mLocation.y / scaled + curDotLayoutView!!.height / 2 - mBitmapTransY - radius) / mBitmap!!.height
+                            var dx = mImageTouchListener.getTotalDx()
+                            var dy = mImageTouchListener.getTotalDy()
+                            Log.d(BaseEditView.TAG, "onFinish dx =" + dx + " dy=" + dy)
+                            // ipsLocator.mLocationActual.x = (ipsLocator.mLocation.x + curDotLayoutView!!.width / 2 - mBitmapTransX - radius - dx) / (mBitmap!!.width * scaled)
+                            // ipsLocator.mLocationActual.y = (ipsLocator.mLocation.y + curDotLayoutView!!.height / 2 - mBitmapTransY - radius - dy) / (mBitmap!!.height * scaled)
+
+                            // ipsLocator.mLocationActual.x = (ipsLocator.mLocation.x + curDotLayoutView!!.width / 2 - radius - mHouseImageView.translationX) / (mBitmap!!.width)
+                            // ipsLocator.mLocationActual.y = (ipsLocator.mLocation.y + curDotLayoutView!!.height / 2 - radius - mHouseImageView.translationY) / (mBitmap!!.height)
                             break;
                         }
                     }

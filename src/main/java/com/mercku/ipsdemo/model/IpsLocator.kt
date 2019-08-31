@@ -8,7 +8,8 @@ data class IpsLocator(var mName: String?, var mType: String, var mId: String) : 
     var mLocation: PointF = PointF(-1f, -1f)
     var mIsSelected: Boolean = false
     var mIsAdded: Boolean = false
-    var mLocationActual: PointF = PointF(-1f, -1f)
+    var mLocationActual: PointF = PointF(0.5f, 0.5f)
+    var mLocationActualRatio: PointF = PointF(0.5f, 0.5f)
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -16,6 +17,7 @@ data class IpsLocator(var mName: String?, var mType: String, var mId: String) : 
             parcel.readString()) {
         mLocation = parcel.readParcelable(PointF::class.java.classLoader)
         mLocationActual = parcel.readParcelable(PointF::class.java.classLoader)
+        mLocationActualRatio = parcel.readParcelable(PointF::class.java.classLoader)
         mIsSelected = parcel.readByte() != 0.toByte()
         mIsAdded = parcel.readByte() != 0.toByte()
 
@@ -27,6 +29,7 @@ data class IpsLocator(var mName: String?, var mType: String, var mId: String) : 
         parcel.writeString(mId)
         parcel.writeParcelable(mLocation, flags)
         parcel.writeParcelable(mLocationActual, flags)
+        parcel.writeParcelable(mLocationActualRatio, flags)
         parcel.writeByte(if (mIsSelected) 1 else 0)
         parcel.writeByte(if (mIsAdded) 1 else 0)
     }

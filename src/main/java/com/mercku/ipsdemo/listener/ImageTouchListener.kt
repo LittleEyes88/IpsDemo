@@ -5,14 +5,25 @@ import android.graphics.Matrix
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.model.IpsLocator
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
 
 
-class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListener {
+class ImageTouchListener : View.OnTouchListener {
+
+    private lateinit var mLayoutView: ViewGroup
+    private lateinit var mImageView: ImageView
+
+    constructor(layoutView: ViewGroup) {
+        mLayoutView = layoutView
+        mImageView = mLayoutView.findViewById(R.id.image_house)
+    }
 
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
@@ -42,9 +53,12 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
     private var mMidPoint: PointF? = null
 
     private var mTotalScaled = 1f// 初始scale倍数
+    private var mTotalDx = 0f
+    private var mTotalDy = 0f
     /**
      * 手指点击屏幕的触摸事件
      */
+
     override fun onTouch(view: View, event: MotionEvent): Boolean {
         /** 通过与运算保留最后八位 MotionEvent.ACTION_MASK = 255  */
         when (event.action and MotionEvent.ACTION_MASK) {
@@ -52,7 +66,7 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
             MotionEvent.ACTION_DOWN -> {
                 mMode = MODE_DRAG
                 // 记录ImageView当前的移动位置
-                mCurrentMatrix.set(mImageView.imageMatrix)
+                //mCurrentMatrix.set(mImageView.imageMatrix)
                 mStartPoint.set(event.x, event.y)
             }
             // 手指在屏幕上移动，改事件会被不断触发
@@ -63,14 +77,52 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
                     val dy = event.y - mStartPoint.y // 得到x轴的移动距离
                     // 在没有移动之前的位置上进行移动
                     mMatrix.set(mCurrentMatrix)
-                    mMatrix.postTranslate(dx, dy)
+                    mTotalDx += dx
+                    mTotalDy += dy
+                    // mMatrix.postTranslate(dx, dy)
+                    mImageView.translationX += dx
+                    mImageView.translationY += dy
+                    mImageView.invalidate()
+                    var index = 0
+                    while (index < mLayoutView.childCount) {
+                        var view = mLayoutView.getChildAt(index)
+                        if (view.getTag() != null && view.getTag() is IpsLocator) {
+                            view.translationX += dx
+                            view.translationY += dy
+                            view.postInvalidate()
+                        }
+                        index++
+                    }
+
                 } else if (mMode == MODE_ZOOM) {
                     val endDis = distance(event)// 结束距离
                     if (endDis > 10f) { // 两个手指并拢在一起的时候像素大于10
                         val scale = endDis / mStartDis// 得到缩放倍数
                         mMatrix.set(mCurrentMatrix)
                         mTotalScaled *= scale
-                        mMatrix.postScale(scale, scale, mMidPoint!!.x, mMidPoint!!.y)
+                        //mMatrix.postScale(scale, scale, mMidPoint!!.x, mMidPoint!!.y)
+
+                        android.util.Log.d("ryq", " mImageView.scaleX=" + mImageView.scaleX +
+                                " mImageView.translationX=" + mImageView.translationX + " mImageView.x=" + mImageView.x)
+                        android.util.Log.d("ryq", "mHouseLayout.pivotX=" + mImageView.pivotX + " mImageView.pivotY=" + mImageView.pivotY)
+                        android.util.Log.d("ryq", " mImageView.width=" + mImageView.width)
+                        var index = 0
+                        while (index < mLayoutView.childCount) {
+                            var view = mLayoutView.getChildAt(index)
+                            if (view.getTag() != null && view.getTag() is IpsLocator) {
+                                var locator = view.getTag() as IpsLocator
+                                var centerX = mLayoutView.width / 2 + mTotalDx
+                                var centerY = mLayoutView.height / 2 + mTotalDy
+                                view.x = (view.x + view.width / 2 - centerX) * scale + centerX - view.width / 2
+                                view.y = (view.y + view.height / 2 - centerY) * scale + centerY - view.height / 2
+                                android.util.Log.d("ryq", "  view.x=" + view.x)
+                                view.postInvalidate()
+                            }
+                            index++
+                        }
+                        mImageView.scaleX *= scale
+                        mImageView.scaleY *= scale
+                        mImageView.invalidate()
                     }
                 }// 放大缩小图片
             // 手指离开屏幕
@@ -90,7 +142,7 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
                 }
             }
         }
-        mImageView.imageMatrix = mMatrix
+        //mImageView.imageMatrix = mMatrix
         return true
     }
 
@@ -116,6 +168,14 @@ class ImageTouchListener(private val mImageView: ImageView) : View.OnTouchListen
 
     public fun getTotalScaled(): Float {
         return mTotalScaled
+    }
+
+    public fun getTotalDx(): Float {
+        return mTotalDx
+    }
+
+    public fun getTotalDy(): Float {
+        return mTotalDy
     }
 
     companion object {
