@@ -1,5 +1,6 @@
 package com.mercku.ipsdemo.adapter
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -7,6 +8,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -14,10 +16,14 @@ import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.activity.HouseLayoutDetailActivity
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.util.CacheUtil
 import java.io.File
 
-class HouseLayoutAdapter(mContext: Context )
+class HouseLayoutAdapter(mContext: Context)
     : BaseDeleteModeRecyclerAdapter(mContext) {
+    private var mEditText: EditText? = null
+    private var mAlertDialog: AlertDialog? = null
+
     fun setDataList(datas: ArrayList<IpsHouse>?) {
 
         clearAllData()
@@ -35,6 +41,12 @@ class HouseLayoutAdapter(mContext: Context )
             android.util.Log.d("ryq", "onCreateViewHolder holder.adapterPosition=" + holder.adapterPosition + " rootView.id=" + rootView.id)
             mOnItemClickListener.onItemClick(holder.adapterPosition, rootView.id)
         }*/
+        holder.mEditNameImageView.setOnClickListener {
+            if (holder.adapterPosition > RecyclerView.NO_POSITION) {
+                onClickEditHouseName(holder.adapterPosition, it)
+            }
+
+        }
         return holder
     }
 
@@ -66,11 +78,43 @@ class HouseLayoutAdapter(mContext: Context )
     }
 
 
-    fun onClickEditHouseName(view: View) {
-        if (view.tag != null && view.tag is IpsHouse) {
-            var ipsHouse = view.tag as IpsHouse
-            android.util.Log.d("ryq", "onClickEditHouseName ipsHouse=" + ipsHouse)
+    fun onClickEditHouseName(position: Int, view: View) {
+
+        var ipsHouse = mDataList[position] as IpsHouse
+        var builder = AlertDialog.Builder(mContext)
+
+        builder.setView(R.layout.dialog_rename)
+        var root = LayoutInflater.from(mContext).inflate(R.layout.dialog_rename, null, false)
+        mEditText = root.findViewById<EditText>(R.id.edit_text_name)
+        mEditText?.setText(ipsHouse.mName, null)
+        ipsHouse.mName?.let {
+            mEditText?.setSelection(ipsHouse.mName!!.length)
         }
+
+        root.setTag(ipsHouse)
+        builder.setView(root)
+        mAlertDialog = builder.create();
+        mAlertDialog?.show()
+    }
+
+    fun onClickCancel(view: View) {
+        mAlertDialog?.dismiss()
+    }
+
+    fun onClickConfim(view: View) {
+
+        var parent = view.parent as ViewGroup
+        if (parent.tag != null && parent.tag is IpsHouse) {
+            val ipsHouse = parent.tag as IpsHouse
+            mEditText?.let {
+                ipsHouse.mName = mEditText!!.text.toString()
+                CacheUtil.updateSomeHouse(ipsHouse,mContext)
+            }
+
+        }
+        mAlertDialog?.dismiss()
+
+        notifyDataSetChanged()
     }
 
     override fun onItemDetail(view: View) {

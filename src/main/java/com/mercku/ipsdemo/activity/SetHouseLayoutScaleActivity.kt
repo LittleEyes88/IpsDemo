@@ -46,7 +46,7 @@ class SetHouseLayoutScaleActivity : BaseContentActivity() {
     override fun onClickRightTitleView() {
         var width = mCustomView.getActualBitmapWidth()
         mIpsHouse.mBitmapActualWidth = width
-        CacheUtil.saveNewHouse(mIpsHouse, this)
+        CacheUtil.updateSomeHouse(mIpsHouse, this)
 
         var intent = Intent(this, HouseLayoutDetailActivity::class.java)
         intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)

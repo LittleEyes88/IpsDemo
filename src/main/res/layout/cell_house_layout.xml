@@ -27,27 +27,38 @@
         app:layout_constraintStart_toEndOf="@+id/image_checkbox"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
-        android:id="@+id/text_house_name"
-        style="@style/mercku_TextBlackColorFourteenSp"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_house_name"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/mercku_margin_twenty"
-        android:layout_marginTop="@dimen/mercku_margin_fifteen"
-        android:layout_marginBottom="@dimen/mercku_margin_fifteen"
-        android:text="M3"
+        android:layout_marginEnd="@dimen/mercku_margin_twenty"
+        app:layout_constraintEnd_toEndOf="@+id/image_layout"
         app:layout_constraintStart_toStartOf="@+id/image_layout"
-        app:layout_constraintTop_toBottomOf="@+id/image_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/image_layout">
 
-    <ImageView
-        android:id="@+id/image_edit_house_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/mercku_margin_five"
-        android:onClick="onClickEditHouseName"
-        android:src="@android:drawable/ic_menu_edit"
-        app:layout_constraintBottom_toBottomOf="@+id/text_house_name"
-        app:layout_constraintStart_toEndOf="@+id/text_house_name"
-        app:layout_constraintTop_toTopOf="@+id/text_house_name" />
+        <TextView
+            android:id="@+id/text_house_name"
+            style="@style/mercku_TextBlackColorFourteenSp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:paddingTop="@dimen/mercku_margin_fifteen"
+            android:paddingBottom="@dimen/mercku_margin_fifteen"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/image_edit_house_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/mercku_margin_five"
+            android:onClick="onClickEditHouseName"
+            android:src="@drawable/router_ic_edit"
+            app:layout_constraintBottom_toBottomOf="@+id/text_house_name"
+            app:layout_constraintStart_toEndOf="@+id/text_house_name"
+            app:layout_constraintTop_toTopOf="@+id/text_house_name" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,8 +12,6 @@ import com.mercku.ipsdemo.view.MySurfaceView
 import android.widget.ImageView
 import android.widget.TextView
 import com.mercku.ipsdemo.constants.ExtraConstants
-import com.mercku.ipsdemo.constants.TypeConstants
-import com.mercku.ipsdemo.listener.DotTouchListener
 import com.mercku.ipsdemo.listener.OnViewTouchListener
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.IpsLocator
@@ -66,7 +64,7 @@ class SurfaceViewActivity : BaseContentActivity() {
 
     override fun onClickRightTitleView() {
         mIpsHouse.mBitmapActualWidth = getActualBitmapWidth()
-        CacheUtil.saveNewHouse(mIpsHouse, this)
+        CacheUtil.updateSomeHouse(mIpsHouse, this)
         var intent = Intent(this, HouseLayoutDetailActivity::class.java)
         intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)
         startActivity(intent)

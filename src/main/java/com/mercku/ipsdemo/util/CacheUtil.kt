@@ -12,7 +12,7 @@ import com.mercku.ipsdemo.model.IpsHouse
  */
 object CacheUtil {
 
-    fun saveNewHouse(ipsHouse: IpsHouse, context: Context) {
+    fun updateSomeHouse(ipsHouse: IpsHouse, context: Context) {
         var acache = AcacheUtil.get(context);
         var cachedData: String? = acache.getAsString(ExtraConstants.EXTRA_HOUSE_LIST)
         var houseList: ArrayList<IpsHouse>? = null

@@ -198,6 +198,14 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks {
 
     }
 
+    fun onClickCancel(view: View) {
+        mHouseLayoutAdapter.onClickCancel(view)
+    }
+
+    fun onClickConfim(view: View) {
+        mHouseLayoutAdapter.onClickConfim(view)
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
