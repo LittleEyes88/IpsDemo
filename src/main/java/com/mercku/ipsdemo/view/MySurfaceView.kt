@@ -72,6 +72,10 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
          * pixInterval: 网格线的横竖间隔，单位:像素
          */
         val pixInterval = BaseEditView.DEFAULT_PIX_INTERVAL
+        var scaled = 1
+        if (mOnViewTouchListener != null) {
+            scaled = mOnViewTouchListener!!.getTotalScaled().toInt()
+        }
         BaseEditView.BITMAP_WIDTH = mContext.resources.displayMetrics.widthPixels * 2
         BaseEditView.BITMAP_HEIGHT = mContext.resources.displayMetrics.heightPixels * 2
         val bitmap = Bitmap.createBitmap(BaseEditView.BITMAP_WIDTH, BaseEditView.BITMAP_HEIGHT, Bitmap.Config.ARGB_8888)  //很重要
@@ -90,7 +94,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
         for (i in 0 until bitmap.width / pixInterval) {
             bimapCanvas.drawLine((i * pixInterval).toFloat(), 0f, (i * pixInterval).toFloat(), bitmap.height.toFloat(), mGridPaint)
         }
-        android.util.Log.d("ryq", " bitmap1 getTranslationX=" + getTranslationX()
+        android.util.Log.d("ryq", " drawBackground getTranslationX=" + getTranslationX()
                 + " getTranslationY=" + getTranslationY()
                 + " getTotalDy=" + mOnViewTouchListener?.getTotalDy()
                 + " getTotalDx=" + mOnViewTouchListener?.getTotalDx()

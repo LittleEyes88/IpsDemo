@@ -120,14 +120,13 @@ open class BaseEditView : View {
         mTextPaint.alpha = 1000//设置透明度
 
 
-        mLinePaint = Paint()
-        mLinePaint.color = resources.getColor(R.color.bg_grid_red)
-        mLinePaint.strokeJoin = Paint.Join.ROUND
-        mLinePaint.strokeCap = Paint.Cap.ROUND
-        mLinePaint.style = Paint.Style.STROKE
-        mLinePaint.strokeWidth = 5f
-        var linePathEffect: DashPathEffect = DashPathEffect(floatArrayOf(6.0f, 4.0f), 0f);
-        mLinePaint.pathEffect = linePathEffect
+
+        mLinePaint = Paint(/*Paint.ANTI_ALIAS_FLAG*/);
+        mLinePaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
+        mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red));
+        mLinePaint.setStrokeWidth(3f);//线条宽度
+        mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(5.0f, 6.0f), 0f));//线的显示效果：破折号格式
+
 
         mGridPaint = Paint()
         mGridPaint.color = resources.getColor(R.color.bg_grid_red)

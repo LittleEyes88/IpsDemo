@@ -131,7 +131,7 @@ class MyLocatorView : BaseEditView {
                             android.util.Log.d("ryq", "drawHouseDetail  "
                                     + " nextLocator.mLocationActual.x=" + nextLocator.mLocationActual.x
                                     + " nextLocator.mLocationActual.y=" + nextLocator.mLocationActual.y)
-                            if (locator.mIsSelected || locator.mIsAdded) {
+                            if (nextLocator.mIsSelected || nextLocator.mIsAdded) {
                                 var nextX = (imgDx + mHouseBitmap!!.width * nextLocator.mLocationActual.x)
                                 var nextDisX = nextX * unit
                                 var nextY = (imgDy + mHouseBitmap!!.height * nextLocator.mLocationActual.y)
