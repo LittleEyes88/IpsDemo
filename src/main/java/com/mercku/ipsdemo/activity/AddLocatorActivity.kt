@@ -186,11 +186,16 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
                 + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
         android.util.Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
-                + " mHouseImageView.measuredHeight=" + mHouseImageView.measuredHeight)
+                + " mHouseImageView.measuredHeight=" + mHouseImageView.measuredHeight
+                + " mHouseImageView.translationX=" + mHouseImageView.translationX
+                + " mHouseImageView.translationY=" + mHouseImageView.translationY)
+
+        dotView.measure(0, 0)
+        dotView.x = mHouseLayout.width / 2.0f - dotView.measuredWidth / 2.0f + mHouseImageView.translationX
+        dotView.y = mHouseLayout.height / 2.0f - dotView.measuredHeight / 2.0f + mHouseImageView.translationY
+
         dotView.setTag(locator)
-        dotView.measure(0,0)
-        dotView.x = mHouseLayout.width / 2.0f - dotView.measuredWidth / 2.0f
-        dotView.y = mHouseLayout.height / 2.0f - dotView.measuredHeight / 2.0f
+
         mHouseLayout.addView(dotView, mHouseLayout.childCount)
         android.util.Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
         android.util.Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
@@ -251,54 +256,4 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
     }
 
-/*    private fun calculateEveryDotLocation() {
-
-
-        var scaled = mImageTouchListener.getTotalScaled()
-        android.util.Log.d("ryq", "  mHouseImageView.translationX=" + mHouseImageView.translationX)
-        android.util.Log.d("ryq", " mHouseImageView.translationY=" + mHouseImageView.translationY)
-        android.util.Log.d("ryq", "  mHouseImageView.scaleX=" + mHouseImageView.scaleX)
-        android.util.Log.d("ryq", " mHouseImageView.scaleY=" + mHouseImageView.scaleY)
-        Log.d(BaseEditView.TAG, "onFinish scaled =" + scaled)
-        var index = 0
-        while (index < mData.size) {
-            var ipsLocator = mData[index]
-            if (ipsLocator.mLocationActual.x > 0 && ipsLocator.mLocationActual.y > 0) {
-                var curDotLayoutView = mHouseLayout.getChildAt(index + 1)
-                var viewIndex = 0
-
-                while (viewIndex < mHouseLayout.childCount) {
-                    //找到对应的view
-                    var view = mHouseLayout.getChildAt(viewIndex)
-                    if (view.tag != null && view.tag is IpsLocator) {
-                        var locator = view.tag as IpsLocator
-                        if (locator.mId.equals(ipsLocator.mId)) {
-                            var radius = 0
-                            var locatorDotImageView = curDotLayoutView!!.findViewById<ImageView>(R.id.image_locator_dot)
-                            if (locatorDotImageView != null) {
-                                radius = locatorDotImageView.height / 2
-                            }
-
-                            //左上角的坐标
-                            var dx = mImageTouchListener.getTotalDx()
-                            var dy = mImageTouchListener.getTotalDy()
-                            Log.d(BaseEditView.TAG, "onFinish dx =" + dx + " dy=" + dy)
-                            // ipsLocator.mLocationActual.x = (ipsLocator.mLocation.x + curDotLayoutView!!.width / 2 - mBitmapTransX - radius - dx) / (mBitmap!!.width * scaled)
-                            // ipsLocator.mLocationActual.y = (ipsLocator.mLocation.y + curDotLayoutView!!.height / 2 - mBitmapTransY - radius - dy) / (mBitmap!!.height * scaled)
-
-                            // ipsLocator.mLocationActual.x = (ipsLocator.mLocation.x + curDotLayoutView!!.width / 2 - radius - mHouseImageView.translationX) / (mBitmap!!.width)
-                            // ipsLocator.mLocationActual.y = (ipsLocator.mLocation.y + curDotLayoutView!!.height / 2 - radius - mHouseImageView.translationY) / (mBitmap!!.height)
-                            break;
-                        }
-                    }
-                    viewIndex++
-                }
-
-
-            }
-            index++
-        }
-
-
-    }*/
 }
