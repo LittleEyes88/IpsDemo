@@ -22,7 +22,7 @@ open class BaseContentActivity : BaseActivity() {
 
     private var mActionBarOverlay = false
 
-    private var mTitleView: TextView? = null
+    var mTitleView: TextView? = null
 
     private var mRightTitleView: TextView? = null
 
@@ -148,6 +148,22 @@ open class BaseContentActivity : BaseActivity() {
         if (mMiddleTitleView != null) {
             mMiddleTitleView!!.text = middleTitle ?: ""
             mMiddleLayoutView!!.visibility = View.VISIBLE
+        }
+    }
+
+    protected fun setLeftTitleText(title: String?) {
+        if (mTitleView != null) {
+            mTitleView!!.text = title ?: ""
+            mTitleView!!.visibility = View.VISIBLE
+        }
+    }
+
+    protected fun setLeftTitleImage(rightTitle: String?, drawableId: Int) {
+        if (mTitleView != null) {
+            mTitleView!!.text = rightTitle ?: ""
+            mTitleView!!.compoundDrawablePadding = resources.getDimensionPixelOffset(R.dimen.mercku_margin_five)
+            mTitleView!!.setCompoundDrawablesWithIntrinsicBounds(getDrawable(drawableId), null, null, null)
+            mTitleView!!.visibility = View.VISIBLE
         }
     }
 

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewStub
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,24 +16,37 @@ import com.mercku.base.ui.BaseContentActivity
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.util.FileUtil
 import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.adapter.BaseDeleteModeRecyclerAdapter
 import com.mercku.ipsdemo.adapter.HouseLayoutAdapter
 import com.mercku.ipsdemo.constants.RequestConstants
 import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.listener.RefreshCompleteListener
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.util.AcacheUtil
+import com.mercku.ipsdemo.util.CacheUtil
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 
 
-class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks, OnItemClickListener {
+class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks {
+    override fun initData() {
 
+    }
+
+    override fun initAdapter() {
+
+    }
+
+    //private lateinit var mDoneText  View: TextView
     private lateinit var mHouseLayoutAdapter: HouseLayoutAdapter
     private lateinit var mData: ArrayList<IpsHouse>
     private lateinit var mAddNewHouseLayout: View
-    private lateinit var mRecyclerView: RecyclerView
+    // private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAddTextView: TextView
-    private lateinit var mNoContentLayout: ViewGroup
 
+    //private lateinit var mNoContentLayout: ViewGroup
+    //protected var mIsEditMode: Boolean = false
+    //protected var mIsAllSelect: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -43,15 +55,18 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks,
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mData = ArrayList<IpsHouse>()
 
-        mHouseLayoutAdapter = HouseLayoutAdapter(this, mData, this)
+        mHouseLayoutAdapter = HouseLayoutAdapter(this)
 
-        mRecyclerView.adapter = mHouseLayoutAdapter
+        setAdapter(mHouseLayoutAdapter)
         mAddNewHouseLayout = findViewById<View>(R.id.layout_new_house)
 
+        mDoneTextView = findViewById(R.id.text_done)
         mNoContentLayout = findViewById(R.id.layout_no_content)
         mAddTextView = mNoContentLayout.findViewById<TextView>(R.id.text_add)
         mAddTextView.setOnClickListener { onClickAdd(it) }
-        showNoContentLayout(mData.size <= 0)
+        exitEditMode()
+
+        mDoneTextView?.setOnClickListener { onClickDone() }
     }
 
     override fun onResume() {
@@ -62,23 +77,102 @@ class MainActivity : BaseContentActivity(), EasyPermissions.PermissionCallbacks,
             var houseList = Gson().fromJson<ArrayList<IpsHouse>>(cachedData, object : TypeToken<ArrayList<IpsHouse>>() {}.type)
             if (!houseList.isEmpty()) {
                 mData = houseList
-                mHouseLayoutAdapter.mData = mData
-                mHouseLayoutAdapter.notifyDataSetChanged()
-                showNoContentLayout(mData.size <= 0)
+                mHouseLayoutAdapter.setDataList(mData)
+                if (mIsEditMode) {
+
+                } else {
+                    exitEditMode()
+
+                }
+
             }
 
         }
 
     }
 
-    override fun onItemClick(position: Int, viewId: Int) {
+    override fun onHomeSelected() {
+        if (mIsEditMode) {
+            //exitEditMode()
+            mTitleView?.let {
+                it.isSelected = !it.isSelected
+                if (it.isSelected) {
+                    mHouseLayoutAdapter.selectAll()
+                } else {
+                    mHouseLayoutAdapter.unselectAll()
+                }
+            }
+        } else {
+            finish()
+        }
+    }
+
+    override fun onClickDelete(listener: RefreshCompleteListener) {
+        mHouseLayoutAdapter.seletedList?.let { mData.removeAll(it) }
+        mHouseLayoutAdapter.setDataList(mData)
+        CacheUtil.saveHouseList(mData, this)
+        if (mData == null || mData.isEmpty()) {
+            exitEditMode()
+        }
+    }
+
+    override fun setSelectAll(isAllSelected: Boolean) {
+        mIsAllSelect = isAllSelected
+        mTitleView?.isSelected = isAllSelected
+    }
+
+    override fun onClickRightTitleView() {
+        mIsAllSelect = false
+        if (!mIsEditMode) {
+            initEditMode()
+        } else {
+            exitEditMode()
+
+        }
+    }
+
+    override fun exitEditMode() {
+        mIsEditMode = false
+        if (mHouseLayoutAdapter != null) {
+            mHouseLayoutAdapter!!.setDeleteMode(false)
+        }
+        setRightTitleText(if (mData.size <= 0) "" else {
+            getText(R.string.edit).toString()
+        })
+        if (mTitleView != null) {
+            mTitleView!!.isSelected = false
+        }
+        setLeftTitleImage("", R.drawable.ic_back)
+
+        setMiddleTitleText(getString(R.string.my_family))
+
+        mDoneTextView.visibility = View.GONE
+
+        showNoContentLayout(mData.size <= 0)
+    }
+
+    override fun initEditMode() {
+        mIsEditMode = true
+        if (mHouseLayoutAdapter != null) {
+            mHouseLayoutAdapter!!.setDeleteMode(true)
+        }
+        mAddNewHouseLayout.visibility = View.GONE
+        setRightTitleText(getText(R.string.cancel).toString())
+
+        setLeftTitleImage(getString(R.string.select_all), R.drawable.ic_checkbox)
+        setMiddleTitleText(getString(R.string.my_family))
+
+        mDoneTextView.visibility = View.VISIBLE
+    }
+
+/*    override fun onItemClick(position: Int, viewId: Int) {
         if (position < mData.size) {
             var ipsHouse = mData[position]
             var intent = Intent(this, HouseLayoutDetailActivity::class.java)
             intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, ipsHouse)
             startActivity(intent)
         }
-    }
+    }*/
 
 
     public fun onClickAdd(view: View) {

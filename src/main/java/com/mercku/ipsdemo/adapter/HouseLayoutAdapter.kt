@@ -1,7 +1,7 @@
 package com.mercku.ipsdemo.adapter
 
-import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.view.LayoutInflater
@@ -10,34 +10,39 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.mercku.ipsdemo.model.IpsLocator
 import com.mercku.ipsdemo.R
-import com.mercku.ipsdemo.constants.TypeConstants
-import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.activity.HouseLayoutDetailActivity
+import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.model.IpsHouse
 import java.io.File
 
-class HouseLayoutAdapter(val mContext: Context, var mData: ArrayList<IpsHouse>,
-                         val mOnItemClickListener: OnItemClickListener)
-    : RecyclerView.Adapter<HouseLayoutAdapter.HouseViewHolder>() {
+class HouseLayoutAdapter(mContext: Context )
+    : BaseDeleteModeRecyclerAdapter(mContext) {
+    fun setDataList(datas: ArrayList<IpsHouse>?) {
+
+        clearAllData()
+        if (datas != null && datas.size != 0) {
+            mDataList.addAll(datas)
+        }
+
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HouseViewHolder {
         var rootView = LayoutInflater.from(mContext).inflate(R.layout.cell_house_layout, parent, false)
         var holder = HouseViewHolder(rootView)
-        rootView.setOnClickListener {
+        /*rootView.setOnClickListener {
             android.util.Log.d("ryq", "onCreateViewHolder holder.adapterPosition=" + holder.adapterPosition + " rootView.id=" + rootView.id)
             mOnItemClickListener.onItemClick(holder.adapterPosition, rootView.id)
-        }
+        }*/
         return holder
     }
 
-    override fun getItemCount(): Int {
-        return mData.size
-    }
 
-    override fun onBindViewHolder(holder: HouseViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        var holder = viewHolder as HouseViewHolder
         if (position > RecyclerView.NO_POSITION) {
-            var ipsHouse = mData[position]
+            var ipsHouse = mDataList[position] as IpsHouse
             android.util.Log.d("ryq", "ipsHouse=" + ipsHouse.mImageFilePath)
             var file = File(ipsHouse.mImageFilePath)
             if (file.exists()) {
@@ -49,9 +54,17 @@ class HouseLayoutAdapter(val mContext: Context, var mData: ArrayList<IpsHouse>,
 
             holder.mNameTextView.text = ipsHouse.mName
             holder.mNameTextView.tag = ipsHouse
-        }
 
+            if (mIsDeleteMode) {
+                viewHolder.mCheckImageView.visibility = View.VISIBLE
+                viewHolder.mCheckImageView.isSelected = ipsHouse.isSelected
+            } else {
+                viewHolder.mCheckImageView.visibility = View.GONE
+            }
+
+        }
     }
+
 
     fun onClickEditHouseName(view: View) {
         if (view.tag != null && view.tag is IpsHouse) {
@@ -60,9 +73,22 @@ class HouseLayoutAdapter(val mContext: Context, var mData: ArrayList<IpsHouse>,
         }
     }
 
-    class HouseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    override fun onItemDetail(view: View) {
+        if (view.findViewById<View>(R.id.text_house_name).tag !is IpsHouse) {
+            return
+        }
+        val ipsHouse = view.findViewById<View>(R.id.text_house_name).tag as IpsHouse
+
+        var intent = Intent(mContext, HouseLayoutDetailActivity::class.java)
+        intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, ipsHouse)
+        mContext.startActivity(intent)
+
+    }
+
+    class HouseViewHolder(itemView: View) : DeleteObjViewHolder(itemView) {
         var mLayoutImageView: ImageView = itemView.findViewById(R.id.image_layout)
         var mEditNameImageView: ImageView = itemView.findViewById(R.id.image_edit_house_name)
+        var mCheckImageView: ImageView = itemView.findViewById(R.id.image_checkbox)
         var mNameTextView: TextView = itemView.findViewById(R.id.text_house_name)
     }
 }

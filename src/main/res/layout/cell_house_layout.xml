@@ -6,13 +6,25 @@
     android:layout_marginTop="@dimen/mercku_margin_twenty"
     android:background="@android:color/white">
 
+
+    <ImageView
+        android:id="@+id/image_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_checkbox"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/image_layout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="@dimen/mercku_view_height_one_hundred_twenty"
+        android:layout_marginStart="@dimen/mercku_margin_twenty"
         android:scaleType="centerCrop"
         android:src="@drawable/img_house_plan"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/image_checkbox"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -25,7 +37,7 @@
         android:layout_marginTop="@dimen/mercku_margin_fifteen"
         android:layout_marginBottom="@dimen/mercku_margin_fifteen"
         android:text="M3"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/image_layout"
         app:layout_constraintTop_toBottomOf="@+id/image_layout" />
 
     <ImageView
@@ -35,7 +47,6 @@
         android:layout_marginStart="@dimen/mercku_margin_five"
         android:onClick="onClickEditHouseName"
         android:src="@android:drawable/ic_menu_edit"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/text_house_name"
         app:layout_constraintStart_toEndOf="@+id/text_house_name"
         app:layout_constraintTop_toTopOf="@+id/text_house_name" />

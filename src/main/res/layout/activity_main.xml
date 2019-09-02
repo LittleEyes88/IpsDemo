@@ -48,10 +48,24 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/mercku_margin_twenty"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/mercku_margin_twenty"
+        app:layout_constraintBottom_toTopOf="@+id/text_done"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_new_house">
+        app:layout_constraintTop_toBottomOf="@+id/layout_new_house"
+        app:layout_goneMarginBottom="0dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
+    <TextView
+        android:id="@+id/text_done"
+        style="@style/mercku_TextWhiteColorSixteenSp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mercku_margin_fifty"
+        android:layout_marginBottom="@dimen/mercku_margin_fifty"
+        android:background="@drawable/mercku_selector_btn_solid_gray_black"
+        android:gravity="center"
+        android:text="@string/delete"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ import android.os.Parcelable
 /**
  * Created by yanqiong.ran on 2019-08-29.
  */
-data class IpsHouse(var mData: ArrayList<IpsLocator>?, var mName: String?, val mId: String, var mImageFilePath: String) : Parcelable {
+data class IpsHouse(var mData: ArrayList<IpsLocator>?, var mName: String?, val mId: String, var mImageFilePath: String) : Parcelable, DeleteObj() {
     var mBitmapActualWidth: Float = 0f
 
     constructor(parcel: Parcel) : this(

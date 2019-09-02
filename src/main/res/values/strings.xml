@@ -4,7 +4,7 @@
     <string name="mercku_trans0270">You have denied Mercku to use your storage. Please authorize in Settings</string>
     <string name="mercku_tag_ab_home">TAG_AB_HOME</string>
     <string name="my_family">我的家庭</string>
-    <string name="add_new_house">新建户型</string>
+    <string name="add_new_house">上传户型</string>
     <string name="no_house">暂无家庭</string>
     <string name="set_locator">设置定位坐标</string>
     <string name="drap_icon">请长按图标拖动到想安装的位置</string>
@@ -17,4 +17,8 @@
     <string name="move_locator_in_house">请将locator移动到户型图中</string>
     <string name="search_sticker">查找sticker</string>
     <string name="family_list">家庭列表</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+    <string name="select_all">全选</string>
+    <string name="edit">编辑</string>
 </resources>

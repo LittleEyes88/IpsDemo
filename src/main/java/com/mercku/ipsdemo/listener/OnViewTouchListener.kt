@@ -94,9 +94,10 @@ class OnViewTouchListener : View.OnTouchListener {
                                 " mTargetView.translationX=" + mTargetView.translationX + " mTargetView.x=" + mTargetView.x)
                         android.util.Log.d("ryq", "mTargetView.pivotX=" + mTargetView.pivotX + " mTargetView.pivotY=" + mTargetView.pivotY)
                         android.util.Log.d("ryq", " mTargetView.width=" + mTargetView.width)
-
-                        mTargetView.scaleX *= scale
-                        mTargetView.scaleY *= scale
+                        if (mTargetView.scaleX * scale > 0.5) {
+                            mTargetView.scaleX *= scale
+                            mTargetView.scaleY *= scale
+                        }
                         mTargetView.invalidate()
 
                     }
@@ -114,7 +115,7 @@ class OnViewTouchListener : View.OnTouchListener {
                 if (mStartDis > 10f) { // 两个手指并拢在一起的时候像素大于10
                     mMidPoint = mid(event)
                     //记录当前ImageView的缩放倍数
-                     mCurrentMatrix.set(mTargetView.matrix)
+                    mCurrentMatrix.set(mTargetView.matrix)
                 }
             }
         }
