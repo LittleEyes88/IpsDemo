@@ -6,13 +6,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.model.IpsLocator
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
 
 
-class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDotMoveFinishListener: OnDotMoveFinishListener) : View.OnTouchListener {
+class DotTouchListener(private val mTargetView: View, val locator: IpsLocator, val mOnDotMoveFinishListener: OnDotMoveFinishListener) : View.OnTouchListener {
 
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
@@ -30,6 +31,9 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
      */
     override fun onTouch(view: View, event: MotionEvent): Boolean {
         /** 通过与运算保留最后八位 MotionEvent.ACTION_MASK = 255  */
+        if (!locator.mIsSelected) {
+            return false
+        }
         when (event.action and MotionEvent.ACTION_MASK) {
             // 手指压下屏幕
             MotionEvent.ACTION_DOWN -> {
@@ -64,7 +68,7 @@ class DotTouchListener(private val mTargetView: View, val mId: String, val mOnDo
             MotionEvent.ACTION_POINTER_DOWN -> {
                 mMode = 0
                 mTargetView.isSelected = false
-                mOnDotMoveFinishListener.onFinish(mTotalDx, mTotalDy, mId, mTargetView)
+                mOnDotMoveFinishListener.onFinish(mTotalDx, mTotalDy, locator.mId, mTargetView)
             }
         }
         return true

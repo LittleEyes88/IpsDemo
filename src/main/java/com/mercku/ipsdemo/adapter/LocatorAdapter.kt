@@ -18,7 +18,7 @@ class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLoca
         var rootView = LayoutInflater.from(mContext).inflate(R.layout.cell_locator, parent, false)
         var holder = LocatorViewHolder(rootView)
         rootView.setOnClickListener {
-            android.util.Log.d("ryq", "onCreateViewHolder holder.adapterPosition=" + holder.adapterPosition+" rootView.id="+rootView.id)
+            android.util.Log.d("ryq", "onCreateViewHolder holder.adapterPosition=" + holder.adapterPosition + " rootView.id=" + rootView.id)
             mOnItemClickListener.onItemClick(holder.adapterPosition, rootView.id)
         }
         return holder
@@ -31,8 +31,8 @@ class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLoca
     override fun onBindViewHolder(holder: LocatorViewHolder, position: Int) {
         if (position > RecyclerView.NO_POSITION) {
             var ipsLocator = mData[position]
-            android.util.Log.d("ryq", "onBindViewHolder ipsLocator.mType=" + ipsLocator.mType+" ipsLocator.mIsSelected="+ipsLocator.mIsSelected
-            +" ipsLocator.mIsAdded="+ipsLocator.mIsAdded)
+            android.util.Log.d("ryq", "onBindViewHolder ipsLocator.mType=" + ipsLocator.mType + " ipsLocator.mIsSelected=" + ipsLocator.mIsSelected
+                    + " ipsLocator.mIsAdded=" + ipsLocator.mIsAdded)
             when (ipsLocator.mType) {
                 TypeConstants.TYPE_M3 -> {
                     holder.mLocatorImageView.setImageResource(R.drawable.img_m3_blank)
@@ -44,6 +44,11 @@ class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLoca
                 }
             }
             holder.mLocatorImageView.isSelected = ipsLocator.mIsSelected
+            holder.mLocatorImageView.visibility = if (ipsLocator.mIsSelected) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
             holder.mLocatorCheckedImageView.visibility = if (ipsLocator.mIsAdded) {
                 View.VISIBLE
             } else {

@@ -33,6 +33,8 @@ import java.io.File
  */
 class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMoveFinishListener {
 
+    private lateinit var mTopHintTextView: TextView
+    private lateinit var mBottomHintTextView: TextView
     private var mInitialWidth: Float = 0f
 
     private var mInitialHeight: Float = 0f
@@ -50,6 +52,8 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_add_locator)
         setRightTitleText(getString(R.string.text_next))
+        mTopHintTextView = findViewById<TextView>(R.id.text_top_hint)
+        mBottomHintTextView = findViewById<TextView>(R.id.text_bottom_hint)
         mHouseLayout = findViewById(R.id.house_layout)
         mHouseImageView = findViewById<ImageView>(R.id.image_house)
         initHouseLayout()
@@ -121,13 +125,18 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         }
         var ipsLocator = mData[position]
         ipsLocator.mIsSelected = true
+
         var pos = 0
-        android.util.Log.d("ryq", "onItemClick position=" + position)
         while (pos < mData.size) {
             var locator = mData[pos]
             android.util.Log.d("ryq", "onItemClick pos=" + pos + " locator.mIsSelected=" + locator.mIsSelected)
-            if (pos != position && locator.mIsSelected) {
-                locator.mIsAdded = true
+            if (pos != position) {
+                locator.mIsAdded = if (locator.mIsSelected) {
+                    true
+                } else {
+                    false
+                }
+                locator.mIsSelected = false
             }
             pos++
         }
@@ -160,6 +169,13 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             addDotToHouse(ipsLocator)
         }
 
+        mBottomHintTextView.visibility = if (mHouseLayout.childCount <= 1) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        mTopHintTextView.visibility = View.VISIBLE
     }
 
     private fun addDotToHouse(locator: IpsLocator) {
@@ -169,7 +185,10 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
         var locatorImageView = dotView!!.findViewById<ImageView>(R.id.image_locator)
         var locatorTextView = dotView!!.findViewById<TextView>(R.id.text_locator)
-
+        dotView.setOnClickListener {
+            locatorImageView.visibility = View.VISIBLE
+            locator.mIsSelected = true
+        }
         when (locator.mType) {
             TypeConstants.TYPE_M3 -> {
                 locatorImageView.setImageResource(R.drawable.selector_coordinate_m3)
@@ -182,7 +201,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         }
         locatorTextView.text = locator.mName
 
-        dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator.mId, this))
+        dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator, this))
         android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
                 + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
         android.util.Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth

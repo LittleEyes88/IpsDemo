@@ -23,4 +23,5 @@
     <string name="edit">编辑</string>
     <string name="house_name">户型名称</string>
     <string name="confirm">确定</string>
+    <string name="choose_locator">点击选择Locator</string>
 </resources>

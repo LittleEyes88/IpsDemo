@@ -2,13 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/house_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/mercku_text_gray"
         app:layout_constraintBottom_toTopOf="@+id/recycler_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -17,8 +17,8 @@
             android:id="@+id/image_house"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/img_house_plan"
             android:scaleType="centerInside"
+            android:src="@drawable/img_house_plan"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -27,15 +27,30 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/text_hint"
+        android:id="@+id/text_top_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/mercku_margin_twenty"
+        android:layout_marginTop="@dimen/mercku_margin_twenty"
         android:text="@string/drap_icon"
         android:textColor="@color/mercku_text_gray"
         android:textSize="@dimen/mercku_text_size_h12"
-        app:layout_constraintBottom_toTopOf="@+id/recycler_view"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_bottom_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mercku_margin_twenty"
+        android:layout_marginBottom="@dimen/mercku_margin_five"
+        android:background="@drawable/ic_tooltip_box"
+        android:padding="@dimen/mercku_margin_ten"
+        android:text="@string/choose_locator"
+        android:textColor="@color/mercku_text_white"
+        android:textSize="@dimen/mercku_text_size_h12"
+        app:layout_constraintBottom_toTopOf="@+id/recycler_view"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
