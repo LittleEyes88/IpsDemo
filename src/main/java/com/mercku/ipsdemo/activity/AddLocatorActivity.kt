@@ -131,10 +131,8 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             var locator = mData[pos]
             android.util.Log.d("ryq", "onItemClick pos=" + pos + " locator.mIsSelected=" + locator.mIsSelected)
             if (pos != position) {
-                locator.mIsAdded = if (locator.mIsSelected) {
-                    true
-                } else {
-                    false
+                if (locator.mIsSelected) {
+                    locator.mIsAdded = true
                 }
                 locator.mIsSelected = false
             }
@@ -176,13 +174,28 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         }
 
         mTopHintTextView.visibility = View.VISIBLE
+        updateHouseChildView()
+    }
+
+    fun updateHouseChildView() {
+        var index = 0
+        while (index < mHouseLayout.childCount) {
+            var view = mHouseLayout.getChildAt(index)
+            if (view != null && view.tag != null && view.tag is IpsHouse) {
+                var ipsHouse = view.tag as IpsHouse
+                var locatorImageView = view!!.findViewById<ImageView>(R.id.image_locator)
+                locatorImageView.visibility = if (ipsHouse.isSelected) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            }
+            index++
+        }
     }
 
     private fun addDotToHouse(locator: IpsLocator) {
-
         var dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
-
-
         var locatorImageView = dotView!!.findViewById<ImageView>(R.id.image_locator)
         var locatorTextView = dotView!!.findViewById<TextView>(R.id.text_locator)
         dotView.setOnClickListener {
@@ -253,6 +266,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                             + "  ipsLocator.mLocationActual.x  =" + ipsLocator.mLocationActual.x
                             + " ipsLocator.mLocationActual.y=" + ipsLocator.mLocationActual.y)
                     // }
+                    ipsLocator.mIsAdded = true
                     break
                 }
             }

@@ -44,11 +44,6 @@ class LocatorAdapter(val mContext: Context, private val mData: ArrayList<IpsLoca
                 }
             }
             holder.mLocatorImageView.isSelected = ipsLocator.mIsSelected
-            holder.mLocatorImageView.visibility = if (ipsLocator.mIsSelected) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
             holder.mLocatorCheckedImageView.visibility = if (ipsLocator.mIsAdded) {
                 View.VISIBLE
             } else {
