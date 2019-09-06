@@ -8,21 +8,44 @@
     android:layout_weight="1">
 
     <ImageView
+        android:id="@+id/image_locator_bg_chosen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_bottom_m3_click_bj"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/text_locator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <ImageView
+        android:id="@+id/image_locator_bg_unchosen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_bottom_bee_normal_bj"
+        app:layout_constraintBottom_toBottomOf="@id/image_locator_bg_chosen"
+        app:layout_constraintEnd_toEndOf="@id/image_locator_bg_chosen"
+        app:layout_constraintStart_toStartOf="@id/image_locator_bg_chosen"
+        app:layout_constraintTop_toTopOf="@id/image_locator_bg_chosen" />
+
+    <ImageView
         android:id="@+id/image_locator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/selector_bg_logo"
         android:src="@drawable/img_m3_blank"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/image_locator_bg_chosen"
+        app:layout_constraintEnd_toEndOf="@id/image_locator_bg_chosen"
+        app:layout_constraintStart_toStartOf="@id/image_locator_bg_chosen"
+        app:layout_constraintTop_toTopOf="@id/image_locator_bg_chosen" />
+
 
     <ImageView
         android:id="@+id/image_locator_checked"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_checked"
-        app:layout_constraintBottom_toBottomOf="@+id/image_locator"
-        app:layout_constraintEnd_toEndOf="@+id/image_locator" />
+        app:layout_constraintBottom_toBottomOf="@id/image_locator_bg_chosen"
+        app:layout_constraintEnd_toEndOf="@id/image_locator_bg_chosen" />
 
     <TextView
         android:id="@+id/text_locator"
@@ -30,7 +53,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="M3"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_locator_checked" />
+        app:layout_constraintTop_toBottomOf="@+id/image_locator_bg_chosen" />
 </androidx.constraintlayout.widget.ConstraintLayout>

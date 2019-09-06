@@ -68,6 +68,7 @@ class SurfaceViewActivity : BaseContentActivity() {
         mIpsHouse.mBitmapActualWidth = getActualBitmapWidth()
         CacheUtil.updateSomeHouse(mIpsHouse, this)
         var intent = Intent(this, HouseLayoutDetailActivity::class.java)
+        intent.putExtra(ExtraConstants.EXTRA_IS_SAVE, true)
         intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)
         startActivity(intent)
     }
@@ -136,4 +137,5 @@ class SurfaceViewActivity : BaseContentActivity() {
         android.util.Log.d("ryq", " locator.mLocationActual.x=" + locator.mLocationActual.x
                 + " locator.mLocationActual.y=" + locator.mLocationActual.y)
     }
+
 }

@@ -18,6 +18,7 @@
     <dimen name="mercku_margin_sixty">60dp</dimen>
     <dimen name="mercku_margin_seventy_two">72dp</dimen>
     <dimen name="mercku_margin_eighty">80dp</dimen>
+    <dimen name="mercku_margin_one_hundred_ten">110dp</dimen>
     <dimen name="mercku_margin_one_hundred_thirty">130dp</dimen>
 
     <dimen name="mercku_radius_two">2dp</dimen>
@@ -31,8 +32,10 @@
     <dimen name="mercku_view_width_w1">1dp</dimen>
     <dimen name="mercku_view_width_twelve">12dp</dimen>
     <dimen name="mercku_view_width_fifteen">15dp</dimen>
+    <dimen name="mercku_view_width_twenty_four">24dp</dimen>
     <dimen name="mercku_view_height_thirty">30dp</dimen>
     <dimen name="mercku_view_width_thirty_five">35dp</dimen>
+    <dimen name="mercku_view_width_sixty">60dp</dimen>
     <dimen name="mercku_view_width_eighty">80dp</dimen>
     <dimen name="mercku_view_width_one_hundred">100dp</dimen>
     <dimen name="mercku_view_width_one_hundred_twenty">120dp</dimen>
@@ -40,7 +43,9 @@
     <dimen name="mercku_view_height_two">2dp</dimen>
     <dimen name="mercku_view_height_four">4dp</dimen>
     <dimen name="mercku_view_height_twenty">20dp</dimen>
+    <dimen name="mercku_view_height_twenty_four">24dp</dimen>
     <dimen name="mercku_view_height_forty">40dp</dimen>
+    <dimen name="mercku_view_height_forty_five">45dp</dimen>
     <dimen name="mercku_view_height_fifty">50dp</dimen>
     <dimen name="mercku_view_height_fifty_two">52dp</dimen>
     <dimen name="mercku_view_height_sixty">60dp</dimen>

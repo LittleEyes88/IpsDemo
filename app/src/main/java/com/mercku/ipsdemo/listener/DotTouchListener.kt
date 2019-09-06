@@ -4,8 +4,6 @@ package com.mercku.ipsdemo.listener
 import android.graphics.PointF
 import android.view.MotionEvent
 import android.view.View
-import android.widget.TextView
-import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.IpsLocator
 
 /**
@@ -42,10 +40,6 @@ class DotTouchListener(private val mTargetView: View, val locator: IpsLocator, v
                 mTotalDx = 0f
                 mTotalDy = 0f
                 mStartPoint.set(event.x, event.y)
-                var locatorTextView = mTargetView.findViewById<TextView>(R.id.text_locator)
-                if (locatorTextView != null) {
-                    locatorTextView.visibility = View.GONE
-                }
             }
             // 手指在屏幕上移动，改事件会被不断触发
             MotionEvent.ACTION_MOVE ->

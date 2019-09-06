@@ -16,6 +16,7 @@ class HouseLayoutDetailActivity : BaseContentActivity() {
     private var mIpsHouse: IpsHouse? = null
     private lateinit var mHouseImageView: ImageView
     private lateinit var mHouseLayout: ViewGroup
+    private lateinit var mSaveSuccessLayout: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +25,10 @@ class HouseLayoutDetailActivity : BaseContentActivity() {
         //mHouseLayout = findViewById(R.id.house_layout)
         //mHouseImageView = findViewById<ImageView>(R.id.image_house)
         mCustomView = findViewById(R.id.layout_custom_view)
-
+        mSaveSuccessLayout = findViewById(R.id.layout_save_success)
+        if (intent.getBooleanExtra(ExtraConstants.EXTRA_IS_SAVE, false)) {
+            mSaveSuccessLayout.visibility = View.VISIBLE
+        }
 
         mIpsHouse = intent.getParcelableExtra<IpsHouse>(ExtraConstants.EXTRA_HOUSE_DETAIL)
         if (mIpsHouse == null) {

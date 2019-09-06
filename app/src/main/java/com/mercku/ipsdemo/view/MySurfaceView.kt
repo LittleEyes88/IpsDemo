@@ -3,6 +3,7 @@ package com.mercku.ipsdemo.view
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -15,7 +16,7 @@ import java.lang.ref.WeakReference
 /**
  * Created by yanqiong.ran on 2019-08-31.
  */
-class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
+open class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
 
     var mOnViewTouchListener: OnViewTouchListener? = null
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
@@ -23,8 +24,10 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-        if (null != mDrawThread) {
-            mDrawThread!!.stopThread();
+        try {
+            mDrawThread?.interrupt()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -72,35 +75,31 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
          * pixInterval: 网格线的横竖间隔，单位:像素
          */
         val pixInterval = BaseEditView.DEFAULT_PIX_INTERVAL
-        var scaled = 1
-        if (mOnViewTouchListener != null) {
-            scaled = mOnViewTouchListener!!.getTotalScaled().toInt()
-        }
         BaseEditView.BITMAP_WIDTH = mContext.resources.displayMetrics.widthPixels * 2
         BaseEditView.BITMAP_HEIGHT = mContext.resources.displayMetrics.heightPixels * 2
         val bitmap = Bitmap.createBitmap(BaseEditView.BITMAP_WIDTH, BaseEditView.BITMAP_HEIGHT, Bitmap.Config.ARGB_8888)  //很重要
 
-        val bimapCanvas = Canvas(bitmap)  //创建画布
+        val bitmapCanvas = Canvas(bitmap)  //创建画布
         val paintBmp = Paint()  //画笔
         paintBmp.isAntiAlias = true //抗锯齿
-        bimapCanvas.drawBitmap(bitmap, Matrix(), paintBmp)  //在画布上画一个和bitmap一模一样的图
+        bitmapCanvas.drawBitmap(bitmap, Matrix(), paintBmp)  //在画布上画一个和bitmap一模一样的图
 
         //根据Bitmap大小，画网格线
         //画横线
         for (i in 0 until bitmap.height / pixInterval) {
-            bimapCanvas.drawLine(0f, (i * pixInterval).toFloat(), bitmap.width.toFloat(), (i * pixInterval).toFloat(), mGridPaint)
+            bitmapCanvas.drawLine(0f, (i * pixInterval).toFloat(), bitmap.width.toFloat(), (i * pixInterval).toFloat(), mGridPaint)
         }
         //画竖线
         for (i in 0 until bitmap.width / pixInterval) {
-            bimapCanvas.drawLine((i * pixInterval).toFloat(), 0f, (i * pixInterval).toFloat(), bitmap.height.toFloat(), mGridPaint)
+            bitmapCanvas.drawLine((i * pixInterval).toFloat(), 0f, (i * pixInterval).toFloat(), bitmap.height.toFloat(), mGridPaint)
         }
-        android.util.Log.d("ryq", " drawBackground getTranslationX=" + getTranslationX()
-                + " getTranslationY=" + getTranslationY()
+        Log.d("ryq", " drawBackground getTranslationX=" + translationX
+                + " getTranslationY=" + translationY
                 + " getTotalDy=" + mOnViewTouchListener?.getTotalDy()
                 + " getTotalDx=" + mOnViewTouchListener?.getTotalDx()
                 + " mOnViewTouchListener?.getTotalScaled()=" + mOnViewTouchListener?.getTotalScaled()
-                + " bitmap.width=" + bitmap.width + " bitmap.height=" + bitmap.height);
-        android.util.Log.d("ryq", "drawBackground  scrollX=$scrollX" + scrollX + " scaleY=" + scaleY + " scaleX=" + scaleX)
+                + " bitmap.width=" + bitmap.width + " bitmap.height=" + bitmap.height)
+        Log.d("ryq", "drawBackground  scrollX=$scrollX$scrollX scaleY=$scaleY scaleX=$scaleX")
 
         val myMatrix = MyMatrix.translationMatrix(-bitmap.width / 2.0f + scrollX, -bitmap.height / 2.0f + scrollY)
         canvas.drawBitmap(bitmap, myMatrix, paintBmp)
@@ -116,49 +115,26 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
         return super.onTouchEvent(event)
     }
 
-    private class DrawThread : Thread {
+    private class DrawThread(reference: MySurfaceView) : Thread() {
 
-        private var isRunning = false;
-        private var mReference: WeakReference<MySurfaceView>
+        private var mReference: WeakReference<MySurfaceView> = WeakReference(reference)
 
-        constructor(reference: MySurfaceView) {
-            isRunning = true;
-            mReference = WeakReference<MySurfaceView>(reference)
-
-        }
-
-        fun stopThread() {
-            isRunning = false
-            var workIsNotFinish = true
-            while (workIsNotFinish) {
-                try {
-                    this.join()// 保证run方法执行完毕
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-                workIsNotFinish = false
-            }
-
-        }
-
-        public override fun run() {
-            while (isRunning) {
-                var canvas: Canvas? = null
-                try {
-                    mReference.get()?.mHolder?.let {
-                        synchronized(it) {
-                            canvas = mReference.get()!!.mHolder!!.lockCanvas();
-                            if (canvas == null)
-
-                                return
-                            canvas!!.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-                            mReference.get()!!.drawBackground(canvas!!)
-                            mReference.get()!!.mHolder!!.unlockCanvasAndPost(canvas)
+        override fun run() {
+            var canvas: Canvas? = null
+            try {
+                mReference.get()?.mHolder?.let {
+                    synchronized(it) {
+                        canvas = mReference.get()!!.mHolder!!.lockCanvas()
+                        if (canvas == null) {
+                            return
                         }
+                        canvas!!.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+                        mReference.get()!!.drawBackground(canvas!!)
+                        mReference.get()!!.mHolder!!.unlockCanvasAndPost(canvas)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace();
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

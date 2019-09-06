@@ -36,7 +36,7 @@
         android:background="@drawable/mercku_selector_btn_solid_gray_black"
         android:gravity="center"
         android:onClick="onClickAdd"
-        android:text="@string/add_new_house"
+        android:text="@string/upload_house_plan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

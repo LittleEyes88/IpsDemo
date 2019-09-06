@@ -6,14 +6,13 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.util.SparseIntArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mercku.ipsdemo.R
@@ -27,8 +26,8 @@ import com.mercku.ipsdemo.listener.OnItemClickListener
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.IpsLocator
 import com.mercku.ipsdemo.util.BitmapUtil
-import com.mercku.ipsdemo.view.BaseEditView
 import java.io.File
+import java.lang.ref.WeakReference
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
@@ -50,6 +49,12 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
     private lateinit var mHouseLayout: ViewGroup
 
+    private var mSelectPos = RecyclerView.NO_POSITION
+    /**
+     * data中的顺序与子元素添加顺序的映射
+     */
+    private val mPositionIndexMap = SparseIntArray()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_add_locator)
@@ -62,7 +67,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
         mRecyclerView = findViewById(R.id.recycler_view)
         var layoutManager = LinearLayoutManager(this)
-        layoutManager.orientation = LinearLayout.HORIZONTAL
+        layoutManager.orientation = RecyclerView.HORIZONTAL
         mRecyclerView.layoutManager = layoutManager
 
         mData = ArrayList<IpsLocator>(4)
@@ -76,13 +81,13 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
     private fun initHouseLayout() {
         var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-        android.util.Log.d("ryq", "AddLocatorActivity  filePath=" + filePath)
+        Log.d("ryq", "AddLocatorActivity  filePath=" + filePath)
         var file = File(filePath)
         if (file.exists()) {
             var uri = Uri.fromFile(file)
             mBitmap = BitmapFactory.decodeStream(
                     getContentResolver().openInputStream(uri))
-            android.util.Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
+            Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
             mHouseImageView.setImageBitmap(mBitmap)
         }
 
@@ -97,7 +102,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                     mInitialWidth = mBitmap!!.width * scale
                 }
 
-                android.util.Log.d("ryq", " mInitialWidth=" + mInitialWidth
+                Log.d("ryq", " mInitialWidth=" + mInitialWidth
                         + " mInitialHeight=" + mInitialHeight
                         + " mHouseImageView.width=" + mHouseImageView.width
                         + " mHouseImageView.height=" + mHouseImageView.height)
@@ -111,7 +116,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
                         var houseLayoutHeight = mHouseLayout.height
                         var houseLayoutWidth = mHouseLayout.width
-                        android.util.Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
+                        Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
 
                         mHouseLayout.getViewTreeObserver()
                                 .removeOnGlobalLayoutListener(this)
@@ -122,88 +127,60 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
 
     override fun onItemClick(position: Int, viewId: Int) {
-        if (mBitmap == null) {
-            Toast.makeText(this, getString(R.string.choose_one_picture), Toast.LENGTH_LONG).show()
-        }
-        var ipsLocator = mData[position]
-        ipsLocator.mIsSelected = true
-
-        var pos = 0
-        while (pos < mData.size) {
-            var locator = mData[pos]
-            android.util.Log.d("ryq", "onItemClick pos=" + pos + " locator.mIsSelected=" + locator.mIsSelected)
-            if (pos != position) {
-                if (locator.mIsSelected) {
-                    locator.mIsAdded = true
-                }
-                locator.mIsSelected = false
-            }
-            pos++
-        }
-        mRecyclerView.adapter?.notifyDataSetChanged()
-        //如果已经被添加，则直接显示
-        var alreadyAdd = false
-        if ((ipsLocator.mIsAdded || ipsLocator.mIsSelected)
-                && (position + 1) < mHouseLayout.childCount) {
-            var viewIndex = 0
-            while (viewIndex < mHouseLayout.childCount) {
-                //找到对应的view
-                var view = mHouseLayout.getChildAt(viewIndex)
-                if (view.tag != null && view.tag is IpsLocator) {
-                    var locator = view.tag as IpsLocator
-                    if (locator.mId.equals(ipsLocator.mId)) {
-                        var locatorImageView = view.findViewById<ImageView>(R.id.image_locator)
-                        if (locatorImageView != null) {
-                            locatorImageView.visibility = View.VISIBLE
-                        }
-                        alreadyAdd = true
-                        break;
-                    }
-                }
-                viewIndex++
-            }
-
-            //如果未被添加，则添加
-        }
-        if (!alreadyAdd) {
-            addDotToHouse(ipsLocator)
-        }
-
-        mBottomHintTextView.visibility = if (mHouseLayout.childCount <= 1) {
+        mBottomHintTextView.visibility = if (mHouseLayout.childCount <= 0) {
             View.VISIBLE
         } else {
             View.GONE
         }
-
         mTopHintTextView.visibility = View.VISIBLE
-        updateHouseChildView()
+
+        //刷新当前选择项
+        mData[position].mIsSelected = !mData[position].mIsSelected
+        mData[position].mIsAdded = true
+        val currentView = mHouseLayout.getChildAt(mPositionIndexMap.get(position, -1))
+        if (currentView == null) {
+            addDotToHouse(position)
+            //因为houselayout已经有了一个imageview子元素
+            if (mPositionIndexMap.size() == 0) {
+                mPositionIndexMap.put(position, 1)
+            } else {
+                mPositionIndexMap.put(position, mHouseLayout.childCount - 1)
+            }
+        } else {
+            refreshLocatorVisible(currentView, mData[position].mIsSelected)
+        }
+        //如果这次跟上次的选择相同，设置为无效值
+        if (position == mSelectPos) {
+            mSelectPos = RecyclerView.NO_POSITION
+            mRecyclerView.adapter?.notifyItemChanged(position)
+            return
+        }
+        //刷新上次选择项
+        if (mSelectPos != RecyclerView.NO_POSITION && mSelectPos != position) {
+            mData[mSelectPos].mIsSelected = !mData[mSelectPos].mIsSelected
+            val oldView = mHouseLayout.getChildAt(mPositionIndexMap.get(mSelectPos, -1))
+            refreshLocatorVisible(oldView, mData[mSelectPos].mIsSelected)
+            mRecyclerView.adapter?.notifyItemChanged(mSelectPos)
+        }
+        mRecyclerView.adapter?.notifyItemChanged(position)
+        mSelectPos = position
     }
 
-    fun updateHouseChildView() {
-        var index = 0
-        while (index < mHouseLayout.childCount) {
-            var view = mHouseLayout.getChildAt(index)
-            if (view != null && view.tag != null && view.tag is IpsHouse) {
-                var ipsHouse = view.tag as IpsHouse
-                var locatorImageView = view!!.findViewById<ImageView>(R.id.image_locator)
-                locatorImageView.visibility = if (ipsHouse.isSelected) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
-            }
-            index++
+    private fun refreshLocatorVisible(view: View?, isSelected: Boolean) {
+        val locatorImageView = view?.findViewById<ImageView>(R.id.image_locator)
+        locatorImageView?.visibility = if (isSelected) {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
         }
     }
 
-    private fun addDotToHouse(locator: IpsLocator) {
+    private fun addDotToHouse(index: Int) {
         var dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
         var locatorImageView = dotView!!.findViewById<ImageView>(R.id.image_locator)
-        var locatorTextView = dotView!!.findViewById<TextView>(R.id.text_locator)
-        dotView.setOnClickListener {
-            locatorImageView.visibility = View.VISIBLE
-            locator.mIsSelected = true
-        }
+        var locatorTextView = dotView.findViewById<TextView>(R.id.text_locator)
+        dotView.setOnClickListener(DotClickListener(this, index))
+        val locator = mData[index]
         when (locator.mType) {
             TypeConstants.TYPE_M3 -> {
                 locatorImageView.setImageResource(R.drawable.selector_coordinate_m3)
@@ -217,9 +194,9 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         locatorTextView.text = locator.mName
 
         dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator, this))
-        android.util.Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
+        Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
                 + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
-        android.util.Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
+        Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
                 + " mHouseImageView.measuredHeight=" + mHouseImageView.measuredHeight
                 + " mHouseImageView.translationX=" + mHouseImageView.translationX
                 + " mHouseImageView.translationY=" + mHouseImageView.translationY)
@@ -230,44 +207,17 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
         dotView.setTag(locator)
 
-        mHouseLayout.addView(dotView, mHouseLayout.childCount)
-        android.util.Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
-        android.util.Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
+        mHouseLayout.addView(dotView)
+        Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
+        Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
     }
 
     override fun onFinish(dx: Float, dy: Float, id: String, targetView: View) {
         if (mBitmap != null) {
-
-            android.util.Log.d("ryq", "onFinish "
-                    + " mHouseImageView!!.left=" + mHouseImageView!!.left
-                    + " mHouseImageView!!.right=" + mHouseImageView!!.right
-                    + " mHouseImageView!!.top=" + mHouseImageView!!.top
-                    + " mHouseImageView!!.bottom=" + mHouseImageView!!.bottom
-                    + " targetView.x=" + targetView.x
-                    + " targetView.y=" + targetView.y)
             for (ipsLocator in mData) {
-                if (ipsLocator.mId.equals(id)) {
-                    /* if (targetView.x < mHouseImageView!!.left
-                             || targetView.x > mHouseImageView!!.right
-                             || targetView.y < mHouseImageView!!.top
-                             || targetView.y > mHouseImageView!!.bottom) {
-                         Toast.makeText(this, getString(R.string.move_locator_in_house), Toast.LENGTH_LONG).show()
-                     } else {*/
-
-                    var locatorTextView = targetView.findViewById<TextView>(R.id.text_locator)
-                    locatorTextView.visibility = View.VISIBLE
-                    var locatorImageView = targetView.findViewById<ImageView>(R.id.image_locator)
-                    locatorImageView.visibility = View.INVISIBLE
-
-                    Log.d(BaseEditView.TAG, "onFinish dx=" + dx + " dy=" + dy
-                            + " targetView.width =" + targetView.width
-                            + " targetView.height =" + targetView.height)
+                if (ipsLocator.mId == id) {
                     ipsLocator.mLocationActual.x += dx / (mInitialWidth * mImageTouchListener.getTotalScaled())
                     ipsLocator.mLocationActual.y += dy / (mInitialHeight * mImageTouchListener.getTotalScaled())
-                    Log.d(BaseEditView.TAG, "onFinish dx=" + dx + " dy=" + dy
-                            + "  ipsLocator.mLocationActual.x  =" + ipsLocator.mLocationActual.x
-                            + " ipsLocator.mLocationActual.y=" + ipsLocator.mLocationActual.y)
-                    // }
                     ipsLocator.mIsAdded = true
                     break
                 }
@@ -280,7 +230,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
     override fun onClickRightTitleView() {
         intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
             var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-            android.util.Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
+            Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
             // calculateEveryDotLocation()
             var house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
             var intent = Intent(this, SurfaceViewActivity::class.java)
@@ -289,6 +239,30 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         }
 
 
+    }
+
+    class DotClickListener(activity: AddLocatorActivity, private val position: Int) : View.OnClickListener {
+        private val mWeakReference = WeakReference(activity)
+        override fun onClick(v: View?) {
+
+            mWeakReference.get()?.let {
+                for (i in 0 until it.mData.size) {
+                    it.mData[i].mIsSelected = i == position
+                }
+                it.mSelectPos = position
+                it.mRecyclerView.adapter?.notifyDataSetChanged()
+                val index = it.mPositionIndexMap[position]
+                for (i in 1 until it.mHouseLayout.childCount) {
+                    val imageView = it.mHouseLayout.getChildAt(i).findViewById<ImageView>(R.id.image_locator)
+                    imageView.visibility = if (index == i) {
+                        View.VISIBLE
+                    } else {
+                        View.INVISIBLE
+                    }
+                }
+            }
+
+        }
     }
 
 }

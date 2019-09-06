@@ -7,9 +7,8 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
-import android.widget.TextView
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.mercku.ipsdemo.R
@@ -38,9 +37,8 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
     //private lateinit var mDoneText  View: TextView
     private lateinit var mHouseLayoutAdapter: HouseLayoutAdapter
     private lateinit var mData: ArrayList<IpsHouse>
-    private lateinit var mAddNewHouseLayout: View
+    private lateinit var mAddNewHouseButton: Button
     // private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mAddTextView: TextView
 
     //protected var mIsEditMode: Boolean = false
     //protected var mIsAllSelect: Boolean = false
@@ -50,7 +48,7 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mIpsInstance = IpsHouse(null, getString(R.string.ips_instance), "", "")
-        mRecyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        mRecyclerView = findViewById(R.id.recycler_view)
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mData = ArrayList<IpsHouse>()
 
@@ -58,7 +56,7 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
         mHouseLayoutAdapter.setOnItemClickListener(this)
 
         setAdapter(mHouseLayoutAdapter)
-        mAddNewHouseLayout = findViewById<View>(R.id.layout_new_house)
+        mAddNewHouseButton = findViewById(R.id.btn_new_house)
 
         mDoneTextView = findViewById(R.id.text_done)
         mDoneTextView.setOnClickListener { onClickDone() }
@@ -126,7 +124,7 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
     override fun exitEditMode() {
         mIsEditMode = false
         mHouseLayoutAdapter.setDeleteMode(false)
-        mAddNewHouseLayout.visibility = View.VISIBLE
+        mAddNewHouseButton.visibility = View.VISIBLE
         setRightTitleText(if (mData.size <= 0) "" else {
             getText(R.string.edit).toString()
         })
@@ -146,7 +144,7 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
     override fun initEditMode() {
         mIsEditMode = true
         mHouseLayoutAdapter.setDeleteMode(true)
-        mAddNewHouseLayout.visibility = View.GONE
+        mAddNewHouseButton.visibility = View.GONE
         setRightTitleText(getText(R.string.cancel).toString())
 
         setLeftTitleImage(getString(R.string.select_all), R.drawable.ic_checkbox)

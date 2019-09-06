@@ -10,41 +10,27 @@
     android:paddingEnd="@dimen/mercku_margin_twenty"
     tools:context=".activity.MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_new_house"
+    <Button
+        android:id="@+id/btn_new_house"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/mercku_view_height_sixty"
-        android:background="@drawable/bg_create_new_house"
+        android:layout_height="@dimen/mercku_view_height_fifty_two"
+        android:layout_marginBottom="@dimen/mercku_margin_fifty"
+        android:background="@drawable/mercku_selector_btn_solid_gray_black"
         android:onClick="onClickAdd"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/text_new_house"
-            style="@style/mercku_TextBlackColorSixteenSp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_add"
-            android:drawablePadding="@dimen/mercku_margin_ten"
-            android:gravity="center"
-            android:text="@string/add_new_house"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+        android:text="@string/upload_house_plan"
+        android:textColor="@color/mercku_home_white"
+        android:textSize="@dimen/mercku_text_size_h16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="@dimen/mercku_margin_twenty"
-        android:layout_marginBottom="@dimen/mercku_margin_twenty"
-        app:layout_constraintBottom_toTopOf="@+id/text_done"
+        android:layout_marginBottom="@dimen/mercku_margin_one_hundred_ten"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_new_house"
-        app:layout_goneMarginBottom="0dp">
+        app:layout_constraintTop_toTopOf="parent">
 
     </androidx.recyclerview.widget.RecyclerView>
 

@@ -55,4 +55,6 @@
 
     <color name="bg_grid_red">#FFD50000</color>
     <color name="mercku_bg_transparent">#0D000000</color>
+    <color name="bg_gray">#FAFAFA</color>
+    <color name="text_gray">#6C6C6C</color>
 </resources>
