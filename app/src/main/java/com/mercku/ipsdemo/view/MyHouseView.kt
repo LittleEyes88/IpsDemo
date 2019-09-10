@@ -1,41 +1,19 @@
 package com.mercku.ipsdemo.view
 
-import android.app.AlertDialog
+
 import android.content.Context
-import android.content.DialogInterface
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Point
-import android.graphics.PointF
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import android.graphics.Region
+import android.graphics.*
 import android.net.Uri
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
-import android.widget.EditText
 import android.widget.Toast
-
-
 import com.mercku.ipsdemo.R
-import com.mercku.ipsdemo.model.FreeRoom
-import com.mercku.ipsdemo.model.IntersectionArea
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.util.BitmapUtil
-import com.mercku.ipsdemo.util.MathUtil
-import com.mercku.ipsdemo.view.BaseEditView.Companion.DEFAULT_DOT_RADIUS
-import com.mercku.ipsdemo.view.BaseEditView.Companion.NONE_TOUCH
 import java.io.File
-
-import java.util.ArrayList
 
 /**
  * Created by yanqiong.ran on 2019-07-19.
@@ -111,9 +89,9 @@ class MyHouseView : BaseEditView {
         clearPaint.setXfermode(PorterDuffXfermode(PorterDuff.Mode.SRC));*/
 
         drawHouseDetail(canvas)
-        canvas.save()
-        drawBackground(canvas)
-        canvas.restore()
+//        canvas.save()
+//        drawBackground(canvas)
+//        canvas.restore()
         canvas.scale(mTotalScaled, mTotalScaled, mZoomMidPoint.x, mZoomMidPoint.y)
 
 

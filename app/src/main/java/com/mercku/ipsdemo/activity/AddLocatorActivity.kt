@@ -11,6 +11,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,10 +21,7 @@ import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.adapter.LocatorAdapter
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.constants.TypeConstants
-import com.mercku.ipsdemo.listener.DotTouchListener
-import com.mercku.ipsdemo.listener.ImageTouchListener
-import com.mercku.ipsdemo.listener.OnDotMoveFinishListener
-import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.listener.*
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.model.IpsLocator
 import com.mercku.ipsdemo.util.BitmapUtil
@@ -32,7 +31,7 @@ import java.lang.ref.WeakReference
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
-class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMoveFinishListener {
+class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMoveFinishListener, OnStopAnimListener {
 
     private lateinit var mTopHintTextView: TextView
     private lateinit var mBottomHintTextView: TextView
@@ -46,6 +45,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
     private lateinit var mRecyclerView: RecyclerView
     private var mBitmap: Bitmap? = null
     private lateinit var mHouseImageView: ImageView
+    private lateinit var mHandImageView: ImageView
 
     private lateinit var mHouseLayout: ViewGroup
 
@@ -54,11 +54,14 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
      * data中的顺序与子元素添加顺序的映射
      */
     private val mPositionIndexMap = SparseIntArray()
+    private var mNeedAnim = true
+    private lateinit var mTranslateAnim: Animation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_add_locator)
         setRightTitleText(getString(R.string.text_next))
+        setRightTitleEnable(R.color.text_color_right, false)
         mTopHintTextView = findViewById<TextView>(R.id.text_top_hint)
         mBottomHintTextView = findViewById<TextView>(R.id.text_bottom_hint)
         mHouseLayout = findViewById(R.id.house_layout)
@@ -66,7 +69,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         initHouseLayout()
 
         mRecyclerView = findViewById(R.id.recycler_view)
-        var layoutManager = LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.HORIZONTAL
         mRecyclerView.layoutManager = layoutManager
 
@@ -77,29 +80,37 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         mData.add(IpsLocator("Bee3", "Bee", "id03"))
         mRecyclerView.adapter = LocatorAdapter(this, mData, this)
 
+        mHandImageView = ImageView(this)
+        mHandImageView.setImageResource(R.drawable.ic_hand)
+        mHouseLayout.post {
+            val x = mHouseLayout.width / 2.0f + mHouseImageView.translationX
+            val y = mHouseLayout.height / 2.0f + mHouseImageView.translationY
+            mTranslateAnim = TranslateAnimation(x - 100, x + 100, y - 100, y + 100)
+            mTranslateAnim.duration = 500
+            mTranslateAnim.repeatCount = TranslateAnimation.INFINITE
+            mTranslateAnim.repeatMode = TranslateAnimation.REVERSE
+        }
     }
 
     private fun initHouseLayout() {
-        var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-        Log.d("ryq", "AddLocatorActivity  filePath=" + filePath)
-        var file = File(filePath)
+        val filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+        Log.d("ryq", "AddLocatorActivity  filePath=$filePath")
+        val file = File(filePath)
         if (file.exists()) {
-            var uri = Uri.fromFile(file)
-            mBitmap = BitmapFactory.decodeStream(
-                    getContentResolver().openInputStream(uri))
+            val uri = Uri.fromFile(file)
+            mBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
             Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
             mHouseImageView.setImageBitmap(mBitmap)
         }
 
-        mImageTouchListener = ImageTouchListener(mHouseLayout)
+        mImageTouchListener = ImageTouchListener(mHouseLayout, this)
         mHouseImageView.setOnTouchListener(mImageTouchListener)
-        mHouseImageView.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        mHouseImageView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-
                 mBitmap?.let {
-                    var scale = BitmapUtil.getScaleAfterResizeBitmap(mBitmap!!, mHouseImageView.width, mHouseImageView.height)
-                    mInitialHeight = mBitmap!!.height.toFloat() * scale
-                    mInitialWidth = mBitmap!!.width * scale
+                    val scale = BitmapUtil.getScaleAfterResizeBitmap(it, mHouseImageView.width, mHouseImageView.height)
+                    mInitialHeight = it.height.toFloat() * scale
+                    mInitialWidth = it.width * scale
                 }
 
                 Log.d("ryq", " mInitialWidth=" + mInitialWidth
@@ -107,24 +118,20 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                         + " mHouseImageView.width=" + mHouseImageView.width
                         + " mHouseImageView.height=" + mHouseImageView.height)
 
-                mHouseImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                mHouseImageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
-        mHouseLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+        mHouseLayout.viewTreeObserver.addOnGlobalLayoutListener(
                 object : ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
+                        val houseLayoutHeight = mHouseLayout.height
+                        val houseLayoutWidth = mHouseLayout.width
+                        Log.d("ryq", " houseLayoutHeight=$houseLayoutHeight houseLayoutWidth=$houseLayoutWidth")
 
-                        var houseLayoutHeight = mHouseLayout.height
-                        var houseLayoutWidth = mHouseLayout.width
-                        Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
-
-                        mHouseLayout.getViewTreeObserver()
-                                .removeOnGlobalLayoutListener(this)
+                        mHouseLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     }
                 })
-
     }
-
 
     override fun onItemClick(position: Int, viewId: Int) {
         mBottomHintTextView.visibility = if (mHouseLayout.childCount <= 0) {
@@ -132,6 +139,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         } else {
             View.GONE
         }
+        setRightTitleEnable(R.color.text_color_right, true)
         mTopHintTextView.visibility = View.VISIBLE
 
         //刷新当前选择项
@@ -148,6 +156,14 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             }
         } else {
             refreshLocatorVisible(currentView, mData[position].mIsSelected)
+        }
+        if (mHouseLayout.childCount == 2 && mNeedAnim) {
+            mHouseLayout.addView(mHandImageView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            mHandImageView.startAnimation(mTranslateAnim)
+            mNeedAnim = false
+        } else if (mHouseLayout.childCount >= 1 && mHouseLayout.indexOfChild(mHandImageView) != -1) {
+            mHandImageView.clearAnimation()
+            mHouseLayout.removeView(mHandImageView)
         }
         //如果这次跟上次的选择相同，设置为无效值
         if (position == mSelectPos) {
@@ -176,24 +192,22 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
     }
 
     private fun addDotToHouse(index: Int) {
-        var dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
-        var locatorImageView = dotView!!.findViewById<ImageView>(R.id.image_locator)
-        var locatorTextView = dotView.findViewById<TextView>(R.id.text_locator)
+        val dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
+        val locatorImageView = dotView!!.findViewById<ImageView>(R.id.image_locator)
+        val locatorTextView = dotView.findViewById<TextView>(R.id.text_locator)
         dotView.setOnClickListener(DotClickListener(this, index))
         val locator = mData[index]
         when (locator.mType) {
             TypeConstants.TYPE_M3 -> {
                 locatorImageView.setImageResource(R.drawable.selector_coordinate_m3)
-
             }
             TypeConstants.TYPE_Bee -> {
                 locatorImageView.setImageResource(R.drawable.selector_coordinate_bee)
-
             }
         }
         locatorTextView.text = locator.mName
 
-        dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator, this))
+        dotView.setOnTouchListener(DotTouchListener(dotView, locator, this, this))
         Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
                 + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
         Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
@@ -205,7 +219,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         dotView.x = mHouseLayout.width / 2.0f - dotView.measuredWidth / 2.0f + mHouseImageView.translationX
         dotView.y = mHouseLayout.height / 2.0f - dotView.measuredHeight / 2.0f + mHouseImageView.translationY
 
-        dotView.setTag(locator)
+        dotView.tag = locator
 
         mHouseLayout.addView(dotView)
         Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
@@ -229,17 +243,21 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
     override fun onClickRightTitleView() {
         intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
-            var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-            Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
+            val filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+            Log.d("ryq", "onClickRightTitleView  filePath=$filePath")
             // calculateEveryDotLocation()
-            var house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
-            var intent = Intent(this, SurfaceViewActivity::class.java)
+            val house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
+            val intent = Intent(this, SurfaceViewActivity::class.java)
             intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
             startActivity(intent)
         }
-
-
     }
+
+    override fun stopAnim() {
+        mHandImageView.clearAnimation()
+        mHouseLayout.removeViewInLayout(mHandImageView)
+    }
+
 
     class DotClickListener(activity: AddLocatorActivity, private val position: Int) : View.OnClickListener {
         private val mWeakReference = WeakReference(activity)

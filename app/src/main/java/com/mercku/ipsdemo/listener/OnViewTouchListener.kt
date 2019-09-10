@@ -3,25 +3,16 @@ package com.mercku.ipsdemo.listener
 
 import android.graphics.Matrix
 import android.graphics.PointF
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import com.mercku.ipsdemo.R
-import com.mercku.ipsdemo.model.IpsLocator
 
 /**
  * Created by yanqiong.ran on 2019-08-28.
  */
 
 
-class OnViewTouchListener : View.OnTouchListener {
-
-    private lateinit var mTargetView: View
-
-    constructor(targetView: View) {
-        mTargetView = targetView
-    }
+class OnViewTouchListener(private val mTargetView: View) : View.OnTouchListener {
 
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
@@ -90,16 +81,15 @@ class OnViewTouchListener : View.OnTouchListener {
                         mTotalScaled *= scale
                         //mMatrix.postScale(scale, scale, mMidPoint!!.x, mMidPoint!!.y)
 
-                        android.util.Log.d("ryq", " mTargetView.scaleX=" + mTargetView.scaleX +
+                        Log.d("ryq", " mTargetView.scaleX=" + mTargetView.scaleX +
                                 " mTargetView.translationX=" + mTargetView.translationX + " mTargetView.x=" + mTargetView.x)
-                        android.util.Log.d("ryq", "mTargetView.pivotX=" + mTargetView.pivotX + " mTargetView.pivotY=" + mTargetView.pivotY)
-                        android.util.Log.d("ryq", " mTargetView.width=" + mTargetView.width)
+                        Log.d("ryq", "mTargetView.pivotX=" + mTargetView.pivotX + " mTargetView.pivotY=" + mTargetView.pivotY)
+                        Log.d("ryq", " mTargetView.width=" + mTargetView.width)
                         if (mTargetView.scaleX * scale > 0.5) {
                             mTargetView.scaleX *= scale
                             mTargetView.scaleY *= scale
                         }
                         mTargetView.invalidate()
-
                     }
                 }// 放大缩小图片
             // 手指离开屏幕
@@ -119,7 +109,7 @@ class OnViewTouchListener : View.OnTouchListener {
                 }
             }
         }
-        //mImageView.imageMatrix = mMatrix
+//        mImageView.imageMatrix = mMatrix
         return true
     }
 

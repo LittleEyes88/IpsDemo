@@ -176,7 +176,7 @@ abstract class DeleteModeActivity : BaseContentActivity(), RefreshCompleteListen
     }
 
     override fun onItemLongClick(position: Int, view: View): Boolean {
-        if (!mIsEditMode && isLongClickEnable(position)) {
+        if (!mIsEditMode) {
             initEditMode()
             mDoneTextView!!.isEnabled = true
             mDeleteModeRecyclerAdapter!!.onItemLongClicked(position)
@@ -184,8 +184,6 @@ abstract class DeleteModeActivity : BaseContentActivity(), RefreshCompleteListen
         }
         return false
     }
-
-    abstract fun isLongClickEnable(position: Int): Boolean
 
     open fun setSelectAll(isAllSelected: Boolean) {
         mIsAllSelect = isAllSelected
