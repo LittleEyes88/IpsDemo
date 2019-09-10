@@ -7,13 +7,10 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Scroller
 
-import com.mercku.ipsdemo.model.FreeRoom
 import com.mercku.ipsdemo.model.Node
-import com.mercku.ipsdemo.model.RectRoom
 import com.mercku.ipsdemo.MyMatrix
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.IpsHouse
-import com.mercku.ipsdemo.util.MathUtil
 
 import java.util.AbstractList
 import java.util.ArrayList
@@ -36,12 +33,8 @@ open class BaseEditView : View {
     protected var mIsScrollingY: Boolean = false
     protected var mCurrentZoomScaleIndex = INIT_ZOOM_SCALES_INDEX
     protected var mViewScale = ZOOM_SCALES[INIT_ZOOM_SCALES_INDEX]
-    protected var mHouseList: ArrayList<RectRoom>? = ArrayList()
-    var freeRoomData = ArrayList<FreeRoom>()
-        protected set
     protected var mNameArrays = ArrayList<String>()
     protected lateinit var mHousePaint: Paint
-    protected var mCurrentNEAR: Int = 0
 
     protected var mSelectedViewIndex: Int = 0
     protected lateinit var mTextPaint: Paint
@@ -50,7 +43,6 @@ open class BaseEditView : View {
     protected lateinit var mLinePaint: Paint
     protected var mLastSeletedViewIndex: Int = 0
     protected lateinit var mGridPaint: Paint
-    protected var mScaleGestureDetector: ScaleGestureDetector? = null
     protected var mIsScale: Boolean = false
 
     protected var mCurrentMode: Int = 0
@@ -152,52 +144,6 @@ open class BaseEditView : View {
         mSelectedViewIndex = NONE_TOUCH
         mLastSeletedViewIndex = NONE_TOUCH
         postInvalidate()
-    }
-
-
-    protected fun drawEverySideLength(canvas: Canvas, room: FreeRoom) {
-        val points = room.dotList
-        if (points == null || points.size < 2) {
-            return
-        }
-        for (index in 0 until points.size - 1) {
-            val curNode = points[index]
-            val nextNode = points[index + 1]
-            val path = Path()
-            path.moveTo(curNode.x, curNode.y)
-            path.lineTo(nextNode.x, nextNode.y)
-            val dis = MathUtil.distance(curNode.x, curNode.y,
-                    nextNode.x, nextNode.y)
-            val length = dis / DEFAULT_PIX_INTERVAL * MESH_ROW_DISTANCE
-            val text = String.format("%.1f", length)
-            val textPaintWidth = mTextPaint.measureText(text)
-            canvas.drawTextOnPath(text, path, dis / 2 - textPaintWidth, -WALL_WIDTH, mTextPaint)
-        }
-    }
-
-
-    protected fun drawRectRoomArea(canvas: Canvas, rect: RectF) {
-        val width = (rect.right - rect.left) / DEFAULT_PIX_INTERVAL * MESH_ROW_DISTANCE
-        val height = (rect.bottom - rect.top) / DEFAULT_PIX_INTERVAL * MESH_COL_DISTANCE
-        val str = String.format("s=%.1f m²", width * height)
-        val textPaintWidth = mTextPaint.measureText(str)
-        val fontMetrics = mTextPaint.fontMetrics
-
-
-        //show the area
-        val textStartX = (rect.right - rect.left) / 2 + rect.left - textPaintWidth / 2
-        val textStartY = (rect.bottom - rect.top) / 2 + rect.top + fontMetrics.bottom - fontMetrics.top
-        canvas.drawText(str, textStartX, textStartY, mTextPaint)
-        //show the width
-        val strWidth = String.format("w=%.1f", width)
-        canvas.drawText(strWidth, textStartX, rect.top + WALL_WIDTH, mTextPaint)
-        //show the Height
-        val strHeight = String.format("h=%.1f", height)
-        val strHeightWidth = mTextPaint.measureText(strHeight)
-        val path = Path()
-        path.moveTo(rect.right - WALL_WIDTH, rect.top + (rect.bottom - rect.top - strHeightWidth) / 2)
-        path.lineTo(rect.right - WALL_WIDTH, rect.bottom - (rect.bottom - rect.top - strHeightWidth) / 2)
-        canvas.drawTextOnPath(strHeight, path, 0f, 0f, mTextPaint)
     }
 
     /**
