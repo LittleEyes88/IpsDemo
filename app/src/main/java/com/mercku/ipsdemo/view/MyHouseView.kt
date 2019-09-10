@@ -81,14 +81,6 @@ class MyHouseView : BaseEditView {
         }
     }
 
-    fun setHouseDetail(ipsHouse: IpsHouse?) {
-        ipsHouse?.let {
-            mHouseDetail = ipsHouse
-            Log.d(BaseEditView.TAG, "setHouseDetail mHouseDetail=" + mHouseDetail)
-            postInvalidate()
-        }
-
-    }
 
     /* fun setImageBitmap(bitmap: Bitmap?) {
          mHouseBitmap = Bitmap.createBitmap(bitmap);
@@ -122,54 +114,16 @@ class MyHouseView : BaseEditView {
     }
 
     private fun drawHouseDetail(canvas: Canvas) {
-        var paint = Paint()
-        paint.isAntiAlias = true
 
-        Log.d(BaseEditView.TAG, "drawHouseDetail canvas mHouseBitmap=" + mHouseBitmap)
-
-        if (mHouseDetail != null && mHouseDetail!!.mImageFilePath != null) {
-            var file = File(mHouseDetail!!.mImageFilePath)
-            if (file.exists()) {
-                var uri = Uri.fromFile(file)
-                var bitmap = BitmapFactory.decodeStream(
-                        mContext.getContentResolver().openInputStream(uri))
-                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
-                // mHouseBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
-
-                Log.d(BaseEditView.TAG, "drawHouseDetail canvas width=" + width + " height=" + height
-                        + " mHouseBitmap!!.width=" + mHouseBitmap!!.width + " mHouseBitmap!!.height=" + mHouseBitmap!!.height)
-                //draw the house layout
-                var imgMatrix = Matrix()
-                var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
-                var imgDy = height / 2.0f - mHouseBitmap!!.height / 2.0f
-                imgMatrix.preTranslate(imgDx, imgDy)
-                canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
-                /**
-                 * draw all locators
-                 */
-                if (mHouseDetail!!.mData != null) {
-                    for (locator in mHouseDetail!!.mData!!) {
-                        if (locator.mIsSelected || locator.mIsAdded) {
-                            var temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
-                            var dotBitmp = Bitmap.createBitmap(temp);
-                            var matrix = Matrix()
-                            Log.d(BaseEditView.TAG, "drawHouseDetail canvaslocator.mLocationActual.x=" + locator.mLocationActual.x
-                                    + " locator.mLocationActual.y=" + locator.mLocationActual.y)
-                            var transx = imgDx + mHouseBitmap!!.width * locator.mLocationActual.x - dotBitmp.width / 2
-                            var transy = imgDy + mHouseBitmap!!.height * locator.mLocationActual.y - dotBitmp.height / 2
-                            matrix.preTranslate(transx, transy)
-                            canvas.drawBitmap(dotBitmp, matrix, paint)
-                        }
-
-                    }
-                }
-            }
-
+        var pointLeft = drawHouseBitmap(canvas)
+        var imgDx = 0f
+        var imgDy = 0f
+        pointLeft?.let {
+            imgDx = it.x
+            imgDy = it.y
         }
-
-
+        drawAllLocator(imgDx, imgDy, canvas)
     }
-
 
     override fun onFinishInflate() {
         super.onFinishInflate()

@@ -17,9 +17,6 @@ import kotlin.math.sqrt
  * Created by yanqiong.ran on 2019-07-19.
  */
 class MyLocatorView : BaseEditView {
-    private var mDotBitmap: Bitmap? = null
-
-
     constructor(context: Context) : super(context) {
 
     }
@@ -28,76 +25,36 @@ class MyLocatorView : BaseEditView {
 
     }
 
-
-    fun setHouseDetail(ipsHouse: IpsHouse?) {
-        ipsHouse?.let {
-            mHouseDetail = ipsHouse
-            Log.d(TAG, "setHouseDetail mHouseDetail=$mHouseDetail")
-            postInvalidate()
-        }
-
-    }
-
-
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(Color.WHITE)
         drawHouseDetail(canvas)
     }
 
     private fun drawHouseDetail(canvas: Canvas) {
-        val paint = Paint()
-        paint.isAntiAlias = true
 
-        Log.d(TAG, "drawHouseDetail canvas mHouseBitmap=$mHouseBitmap")
-        if (mHouseDetail == null || TextUtils.isEmpty(mHouseDetail!!.mImageFilePath)) {
-            return
-        }
-        if (mHouseBitmap == null) {
-            val file = File(mHouseDetail!!.mImageFilePath)
-            if (file.exists()) {
-                val uri = Uri.fromFile(file)
-                val bitmap = BitmapFactory.decodeStream(
-                        mContext.contentResolver.openInputStream(uri))
-                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
-            }
+        var pointLeft = drawHouseBitmap(canvas)
+        var imgDx = 0f
+        var imgDy = 0f
+        pointLeft?.let {
+            imgDx = it.x
+            imgDy = it.y
         }
 
-        val imgMatrix = Matrix()
-        val imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
-        val imgDy = height / 3.0f - mHouseBitmap!!.height / 2.0f
-        imgMatrix.preTranslate(imgDx, imgDy)
-        canvas.drawBitmap(mHouseBitmap!!, imgMatrix, paint)
+        var points = drawAllLocator(imgDx, imgDy, canvas)
+        drawLineBetweenAnyTwoPoints(imgDx, imgDy, canvas)
+    }
 
-        if (mHouseDetail?.mData == null) {
-            return
-        }
+    private fun drawLineBetweenAnyTwoPoints(startX: Float, startY: Float, canvas: Canvas) {
         var index = 0
-        if (mDotBitmap == null) {
-            val temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
-            mDotBitmap = Bitmap.createBitmap(temp)
-        }
-        while (index < mHouseDetail!!.mData!!.size) {
-            val locator = mHouseDetail!!.mData!![index]
-            if (locator.mIsSelected || locator.mIsAdded) {
-                val matrix = Matrix()
-                val transx = imgDx + mHouseBitmap!!.width * locator.mLocationActual.x - mDotBitmap!!.width / 2
-                val transy = imgDy + mHouseBitmap!!.height * locator.mLocationActual.y - mDotBitmap!!.height / 2
-
-                matrix.preTranslate(transx, transy)
-                canvas.drawBitmap(mDotBitmap!!, matrix, paint)
-            }
-            index++
-        }
-        index = 0
         while (index < mHouseDetail!!.mData!!.size) {
             val locator = mHouseDetail!!.mData!![index]
             //todo 有负数
             Log.d("ryq", "drawHouseDetail   index=" + index + " locator.mLocationActual.x=" + locator.mLocationActual.x
                     + " locator.mLocationActual.y=" + locator.mLocationActual.y)
             val unit = mHouseDetail!!.mBitmapActualWidth / mHouseBitmap!!.width
-            val curX = (imgDx + mHouseBitmap!!.width * locator.mLocationActual.x)
+            val curX = (startX + mHouseBitmap!!.width * locator.mLocationActual.x)
             val curDisX = curX * unit
-            val curY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+            val curY = (startY + mHouseBitmap!!.height * locator.mLocationActual.y)
             val curDisY = curY * unit
 
             if (locator.mIsSelected || locator.mIsAdded) {
@@ -108,9 +65,9 @@ class MyLocatorView : BaseEditView {
                             + " nextLocator.mLocationActual.x=" + nextLocator.mLocationActual.x
                             + " nextLocator.mLocationActual.y=" + nextLocator.mLocationActual.y)
                     if (nextLocator.mIsSelected || nextLocator.mIsAdded) {
-                        val nextX = (imgDx + mHouseBitmap!!.width * nextLocator.mLocationActual.x)
+                        val nextX = (startX + mHouseBitmap!!.width * nextLocator.mLocationActual.x)
                         val nextDisX = nextX * unit
-                        val nextY = (imgDy + mHouseBitmap!!.height * nextLocator.mLocationActual.y)
+                        val nextY = (startY + mHouseBitmap!!.height * nextLocator.mLocationActual.y)
                         val nextDisY = nextY * unit
                         Log.d("ryq", "drawHouseDetail  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
                         val dis = sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
@@ -130,6 +87,7 @@ class MyLocatorView : BaseEditView {
             index++
 
         }
+
     }
 
     override fun onDetachedFromWindow() {

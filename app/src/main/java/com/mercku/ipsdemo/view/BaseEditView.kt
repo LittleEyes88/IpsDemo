@@ -2,7 +2,10 @@ package com.mercku.ipsdemo.view
 
 import android.content.Context
 import android.graphics.*
+import android.net.Uri
+import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Scroller
@@ -11,6 +14,8 @@ import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.MyMatrix
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.util.BitmapUtil
+import java.io.File
 
 import java.util.AbstractList
 import java.util.ArrayList
@@ -64,6 +69,7 @@ open class BaseEditView : View {
 
     protected var mHouseDetail: IpsHouse? = null
     protected var mHouseBitmap: Bitmap? = null
+    protected var mDotBitmap: Bitmap? = null
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -112,7 +118,6 @@ open class BaseEditView : View {
         mTextPaint.alpha = 1000//设置透明度
 
 
-
         mLinePaint = Paint(/*Paint.ANTI_ALIAS_FLAG*/);
         mLinePaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
         mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red));
@@ -137,13 +142,83 @@ open class BaseEditView : View {
 
     }
 
-    fun setMode(mode: Int) {
-        mCurrentMode = mode
-        mSelectedDotIndex = NONE_TOUCH
-        mLastSeletedDotIndex = NONE_TOUCH
-        mSelectedViewIndex = NONE_TOUCH
-        mLastSeletedViewIndex = NONE_TOUCH
-        postInvalidate()
+    fun setHouseDetail(ipsHouse: IpsHouse?) {
+        ipsHouse?.let {
+            mHouseDetail = ipsHouse
+            Log.d(TAG, "setHouseDetail mHouseDetail=$mHouseDetail")
+            postInvalidate()
+        }
+
+    }
+
+    /**
+     * 绘制户型图
+     * 返回左上角的坐标
+     */
+    fun drawHouseBitmap(canvas: Canvas): PointF? {
+        var paint = Paint()
+        paint.isAntiAlias = true
+
+        Log.d(BaseEditView.TAG, "drawHouseDetail canvas mHouseBitmap=" + mHouseBitmap)
+        if (mHouseDetail == null || TextUtils.isEmpty(mHouseDetail!!.mImageFilePath)) {
+            return null
+        }
+        if (mHouseBitmap == null) {
+            val file = File(mHouseDetail!!.mImageFilePath)
+            if (file.exists()) {
+                val uri = Uri.fromFile(file)
+                val bitmap = BitmapFactory.decodeStream(
+                        mContext.contentResolver.openInputStream(uri))
+                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
+            }
+        }
+
+        var imgMatrix = Matrix()
+        var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
+        var imgDy = height / 3.0f - mHouseBitmap!!.height / 2.0f
+        imgMatrix.preTranslate(imgDx, imgDy)
+        canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
+
+        var point = PointF()
+        point.x = imgDx
+        point.y = imgDy
+        return point
+    }
+
+    /**
+     *
+     */
+    fun drawAllLocator(startX: Float, startY: Float, canvas: Canvas): ArrayList<PointF>? {
+        var paint = Paint()
+        paint.isAntiAlias = true
+        if (mHouseDetail == null || mHouseDetail!!.mData == null) {
+            return null
+        }
+        var index = 0
+        if (mDotBitmap == null) {
+            val temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
+            mDotBitmap = Bitmap.createBitmap(temp)
+        }
+        var points = ArrayList<PointF>(mHouseDetail!!.mData!!.size)
+        //draw locators
+        while (index < mHouseDetail!!.mData!!.size) {
+            var locator = mHouseDetail!!.mData!![index]
+            if (locator.mIsSelected || locator.mIsAdded) {
+
+                var matrix = Matrix()
+                var transx = startX + mHouseBitmap!!.width * locator.mLocationActual.x
+                var transy = startY + mHouseBitmap!!.height * locator.mLocationActual.y
+
+                var point = PointF(transx, transy)
+                points.add(point)
+                matrix.preTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+
+                canvas.drawBitmap(mDotBitmap, matrix, paint)
+            }
+            index++
+
+        }
+        return points
     }
 
     /**
