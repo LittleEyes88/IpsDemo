@@ -1,5 +1,6 @@
 package com.mercku.ipsdemo.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
@@ -75,6 +76,8 @@ class SurfaceViewActivity : BaseContentActivity() {
         intent.putExtra(ExtraConstants.EXTRA_IS_SAVE, true)
         intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, mIpsHouse)
         startActivity(intent)
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     private fun getActualBitmapWidth(): Float {

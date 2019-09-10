@@ -1,5 +1,6 @@
 package com.mercku.ipsdemo.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.adapter.LocatorAdapter
 import com.mercku.ipsdemo.constants.ExtraConstants
+import com.mercku.ipsdemo.constants.RequestConstants
 import com.mercku.ipsdemo.constants.TypeConstants
 import com.mercku.ipsdemo.listener.*
 import com.mercku.ipsdemo.model.IpsHouse
@@ -249,7 +251,14 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
             val house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
             val intent = Intent(this, SurfaceViewActivity::class.java)
             intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
-            startActivity(intent)
+            startActivityForResult(intent, RequestConstants.REQUEST_NEW_HOUSE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RequestConstants.REQUEST_NEW_HOUSE && resultCode == Activity.RESULT_OK) {
+            finish()
         }
     }
 
