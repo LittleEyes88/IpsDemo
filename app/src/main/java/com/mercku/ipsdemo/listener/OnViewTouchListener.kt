@@ -14,6 +14,23 @@ import android.view.View
 
 class OnViewTouchListener(private val mTargetView: View) : View.OnTouchListener {
 
+    companion object {
+
+        /**
+         * 拖拉照片模式
+         */
+        private const val MODE_DRAG = 1
+        /**
+         * 放大缩小照片模式
+         */
+        private const val MODE_ZOOM = 2
+
+        private const val MAX_SCALE = 5f
+
+        private const val MIN_SCALE = 0.5f
+    }
+
+
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
      */
@@ -75,22 +92,22 @@ class OnViewTouchListener(private val mTargetView: View) : View.OnTouchListener 
 
                 } else if (mMode == MODE_ZOOM) {
                     val endDis = distance(event)// 结束距离
-                    if (endDis > 10f) { // 两个手指并拢在一起的时候像素大于10
-                        val scale = endDis / mStartDis// 得到缩放倍数
+                    val scale = endDis / mStartDis// 得到缩放倍数
+                    //mMatrix.postScale(scale, scale, mMidPoint!!.x, mMidPoint!!.y)
+                    Log.d("ryq", " mTargetView.scaleX=" + mTargetView.scaleX +
+                            " mTargetView.translationX=" + mTargetView.translationX + " mTargetView.x=" + mTargetView.x)
+                    Log.d("ryq", "mTargetView.pivotX=" + mTargetView.pivotX + " mTargetView.pivotY=" + mTargetView.pivotY)
+                    Log.d("ryq", " mTargetView.width=" + mTargetView.width)
+                    if (mTargetView.scaleX * scale in MIN_SCALE..MAX_SCALE) {
                         mMatrix.set(mCurrentMatrix)
+                        mTargetView.scaleX *= scale
+                        mTargetView.scaleY *= scale
                         mTotalScaled *= scale
-                        //mMatrix.postScale(scale, scale, mMidPoint!!.x, mMidPoint!!.y)
-
-                        Log.d("ryq", " mTargetView.scaleX=" + mTargetView.scaleX +
-                                " mTargetView.translationX=" + mTargetView.translationX + " mTargetView.x=" + mTargetView.x)
-                        Log.d("ryq", "mTargetView.pivotX=" + mTargetView.pivotX + " mTargetView.pivotY=" + mTargetView.pivotY)
-                        Log.d("ryq", " mTargetView.width=" + mTargetView.width)
-                        if (mTargetView.scaleX * scale > 0.5) {
-                            mTargetView.scaleX *= scale
-                            mTargetView.scaleY *= scale
+                        if (mTotalScaled > MAX_SCALE) {
+                            mTotalScaled = MAX_SCALE
                         }
-                        mTargetView.invalidate()
                     }
+                    mTargetView.invalidate()
                 }// 放大缩小图片
             // 手指离开屏幕
             MotionEvent.ACTION_UP,
@@ -143,17 +160,6 @@ class OnViewTouchListener(private val mTargetView: View) : View.OnTouchListener 
 
     public fun getTotalDy(): Float {
         return mTotalDy
-    }
-
-    companion object {
-        /**
-         * 拖拉照片模式
-         */
-        private val MODE_DRAG = 1
-        /**
-         * 放大缩小照片模式
-         */
-        private val MODE_ZOOM = 2
     }
 
 }

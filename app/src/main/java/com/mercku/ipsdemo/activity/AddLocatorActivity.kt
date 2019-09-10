@@ -245,10 +245,10 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
 
     override fun onClickRightTitleView() {
         intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
-            val filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-            Log.d("ryq", "onClickRightTitleView  filePath=$filePath")
+            stopAnim()
+            Log.d("ryq", "onClickRightTitleView  filePath=$it")
             // calculateEveryDotLocation()
-            val house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
+            val house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), it)
             val intent = Intent(this, SurfaceViewActivity::class.java)
             intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
             startActivityForResult(intent, RequestConstants.REQUEST_NEW_HOUSE)
