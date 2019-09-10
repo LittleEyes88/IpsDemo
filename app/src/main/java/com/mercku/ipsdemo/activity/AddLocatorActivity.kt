@@ -1,0 +1,268 @@
+package com.mercku.ipsdemo.activity
+
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.util.SparseIntArray
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.mercku.ipsdemo.R
+import com.mercku.ipsdemo.adapter.LocatorAdapter
+import com.mercku.ipsdemo.constants.ExtraConstants
+import com.mercku.ipsdemo.constants.TypeConstants
+import com.mercku.ipsdemo.listener.DotTouchListener
+import com.mercku.ipsdemo.listener.ImageTouchListener
+import com.mercku.ipsdemo.listener.OnDotMoveFinishListener
+import com.mercku.ipsdemo.listener.OnItemClickListener
+import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.model.IpsLocator
+import com.mercku.ipsdemo.util.BitmapUtil
+import java.io.File
+import java.lang.ref.WeakReference
+
+/**
+ * Created by yanqiong.ran on 2019-08-28.
+ */
+class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMoveFinishListener {
+
+    private lateinit var mTopHintTextView: TextView
+    private lateinit var mBottomHintTextView: TextView
+    private var mInitialWidth: Float = 0f
+
+    private var mInitialHeight: Float = 0f
+    private lateinit var mImageTouchListener: ImageTouchListener
+    private var mBitmapTransX: Float = 0f
+    private var mBitmapTransY: Float = 0f
+    private lateinit var mData: ArrayList<IpsLocator>
+    private lateinit var mRecyclerView: RecyclerView
+    private var mBitmap: Bitmap? = null
+    private lateinit var mHouseImageView: ImageView
+
+    private lateinit var mHouseLayout: ViewGroup
+
+    private var mSelectPos = RecyclerView.NO_POSITION
+    /**
+     * data中的顺序与子元素添加顺序的映射
+     */
+    private val mPositionIndexMap = SparseIntArray()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.layout_add_locator)
+        setRightTitleText(getString(R.string.text_next))
+        mTopHintTextView = findViewById<TextView>(R.id.text_top_hint)
+        mBottomHintTextView = findViewById<TextView>(R.id.text_bottom_hint)
+        mHouseLayout = findViewById(R.id.house_layout)
+        mHouseImageView = findViewById<ImageView>(R.id.image_house)
+        initHouseLayout()
+
+        mRecyclerView = findViewById(R.id.recycler_view)
+        var layoutManager = LinearLayoutManager(this)
+        layoutManager.orientation = RecyclerView.HORIZONTAL
+        mRecyclerView.layoutManager = layoutManager
+
+        mData = ArrayList<IpsLocator>(4)
+        mData.add(IpsLocator("M3", "M3", "id00"))
+        mData.add(IpsLocator("Bee1", "Bee", "id01"))
+        mData.add(IpsLocator("Bee2", "Bee", "id02"))
+        mData.add(IpsLocator("Bee3", "Bee", "id03"))
+        mRecyclerView.adapter = LocatorAdapter(this, mData, this)
+
+    }
+
+    private fun initHouseLayout() {
+        var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+        Log.d("ryq", "AddLocatorActivity  filePath=" + filePath)
+        var file = File(filePath)
+        if (file.exists()) {
+            var uri = Uri.fromFile(file)
+            mBitmap = BitmapFactory.decodeStream(
+                    getContentResolver().openInputStream(uri))
+            Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
+            mHouseImageView.setImageBitmap(mBitmap)
+        }
+
+        mImageTouchListener = ImageTouchListener(mHouseLayout)
+        mHouseImageView.setOnTouchListener(mImageTouchListener)
+        mHouseImageView.getViewTreeObserver().addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+
+                mBitmap?.let {
+                    var scale = BitmapUtil.getScaleAfterResizeBitmap(mBitmap!!, mHouseImageView.width, mHouseImageView.height)
+                    mInitialHeight = mBitmap!!.height.toFloat() * scale
+                    mInitialWidth = mBitmap!!.width * scale
+                }
+
+                Log.d("ryq", " mInitialWidth=" + mInitialWidth
+                        + " mInitialHeight=" + mInitialHeight
+                        + " mHouseImageView.width=" + mHouseImageView.width
+                        + " mHouseImageView.height=" + mHouseImageView.height)
+
+                mHouseImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+            }
+        })
+        mHouseLayout.getViewTreeObserver().addOnGlobalLayoutListener(
+                object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+
+                        var houseLayoutHeight = mHouseLayout.height
+                        var houseLayoutWidth = mHouseLayout.width
+                        Log.d("ryq", " houseLayoutHeight=" + houseLayoutHeight + " houseLayoutWidth=" + houseLayoutWidth)
+
+                        mHouseLayout.getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this)
+                    }
+                })
+
+    }
+
+
+    override fun onItemClick(position: Int, viewId: Int) {
+        mBottomHintTextView.visibility = if (mHouseLayout.childCount <= 0) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+        mTopHintTextView.visibility = View.VISIBLE
+
+        //刷新当前选择项
+        mData[position].mIsSelected = !mData[position].mIsSelected
+        mData[position].mIsAdded = true
+        val currentView = mHouseLayout.getChildAt(mPositionIndexMap.get(position, -1))
+        if (currentView == null) {
+            addDotToHouse(position)
+            //因为houselayout已经有了一个imageview子元素
+            if (mPositionIndexMap.size() == 0) {
+                mPositionIndexMap.put(position, 1)
+            } else {
+                mPositionIndexMap.put(position, mHouseLayout.childCount - 1)
+            }
+        } else {
+            refreshLocatorVisible(currentView, mData[position].mIsSelected)
+        }
+        //如果这次跟上次的选择相同，设置为无效值
+        if (position == mSelectPos) {
+            mSelectPos = RecyclerView.NO_POSITION
+            mRecyclerView.adapter?.notifyItemChanged(position)
+            return
+        }
+        //刷新上次选择项
+        if (mSelectPos != RecyclerView.NO_POSITION && mSelectPos != position) {
+            mData[mSelectPos].mIsSelected = !mData[mSelectPos].mIsSelected
+            val oldView = mHouseLayout.getChildAt(mPositionIndexMap.get(mSelectPos, -1))
+            refreshLocatorVisible(oldView, mData[mSelectPos].mIsSelected)
+            mRecyclerView.adapter?.notifyItemChanged(mSelectPos)
+        }
+        mRecyclerView.adapter?.notifyItemChanged(position)
+        mSelectPos = position
+    }
+
+    private fun refreshLocatorVisible(view: View?, isSelected: Boolean) {
+        val locatorImageView = view?.findViewById<ImageView>(R.id.image_locator)
+        locatorImageView?.visibility = if (isSelected) {
+            View.VISIBLE
+        } else {
+            View.INVISIBLE
+        }
+    }
+
+    private fun addDotToHouse(index: Int) {
+        var dotView = LayoutInflater.from(this).inflate(R.layout.cell_locator_dot, mHouseLayout, false)
+        var locatorImageView = dotView!!.findViewById<ImageView>(R.id.image_locator)
+        var locatorTextView = dotView.findViewById<TextView>(R.id.text_locator)
+        dotView.setOnClickListener(DotClickListener(this, index))
+        val locator = mData[index]
+        when (locator.mType) {
+            TypeConstants.TYPE_M3 -> {
+                locatorImageView.setImageResource(R.drawable.selector_coordinate_m3)
+
+            }
+            TypeConstants.TYPE_Bee -> {
+                locatorImageView.setImageResource(R.drawable.selector_coordinate_bee)
+
+            }
+        }
+        locatorTextView.text = locator.mName
+
+        dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator, this))
+        Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
+                + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
+        Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
+                + " mHouseImageView.measuredHeight=" + mHouseImageView.measuredHeight
+                + " mHouseImageView.translationX=" + mHouseImageView.translationX
+                + " mHouseImageView.translationY=" + mHouseImageView.translationY)
+
+        dotView.measure(0, 0)
+        dotView.x = mHouseLayout.width / 2.0f - dotView.measuredWidth / 2.0f + mHouseImageView.translationX
+        dotView.y = mHouseLayout.height / 2.0f - dotView.measuredHeight / 2.0f + mHouseImageView.translationY
+
+        dotView.setTag(locator)
+
+        mHouseLayout.addView(dotView)
+        Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
+        Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
+    }
+
+    override fun onFinish(dx: Float, dy: Float, id: String, targetView: View) {
+        if (mBitmap != null) {
+            for (ipsLocator in mData) {
+                if (ipsLocator.mId == id) {
+                    ipsLocator.mLocationActual.x += dx / (mInitialWidth * mImageTouchListener.getTotalScaled())
+                    ipsLocator.mLocationActual.y += dy / (mInitialHeight * mImageTouchListener.getTotalScaled())
+                    ipsLocator.mIsAdded = true
+                    break
+                }
+            }
+        }
+
+    }
+
+
+    override fun onClickRightTitleView() {
+        intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
+            var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+            Log.d("ryq", "onClickRightTitleView  filePath=" + filePath)
+            // calculateEveryDotLocation()
+            var house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), filePath)
+            var intent = Intent(this, SurfaceViewActivity::class.java)
+            intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, house)
+            startActivity(intent)
+        }
+
+
+    }
+
+    class DotClickListener(activity: AddLocatorActivity, private val position: Int) : View.OnClickListener {
+        private val mWeakReference = WeakReference(activity)
+        override fun onClick(v: View?) {
+
+            mWeakReference.get()?.let {
+                for (i in 0 until it.mData.size) {
+                    it.mData[i].mIsSelected = i == position
+                }
+                it.mSelectPos = position
+                it.mRecyclerView.adapter?.notifyDataSetChanged()
+                val index = it.mPositionIndexMap[position]
+                for (i in 1 until it.mHouseLayout.childCount) {
+                    val imageView = it.mHouseLayout.getChildAt(i).findViewById<ImageView>(R.id.image_locator)
+                    imageView.visibility = if (index == i) {
+                        View.VISIBLE
+                    } else {
+                        View.INVISIBLE
+                    }
+                }
+            }
+
+        }
+    }
+
+}

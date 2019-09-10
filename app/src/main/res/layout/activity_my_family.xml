@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/mercku_margin_twenty"
+        android:layout_marginEnd="@dimen/mercku_margin_twenty"
+        android:src="@drawable/img_welcome_illustrate"
+        app:layout_constraintBottom_toTopOf="@id/text_hint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/text_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/mercku_margin_thirty"
+        android:text="@string/only_3_steps"
+        android:textColor="@color/mercku_text_black"
+        app:layout_constraintBottom_toTopOf="@id/btn_next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image" />
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mercku_view_height_fifty_two"
+        android:layout_marginStart="@dimen/mercku_margin_twenty"
+        android:layout_marginTop="@dimen/mercku_margin_seventy_two"
+        android:layout_marginEnd="@dimen/mercku_margin_twenty"
+        android:background="@drawable/mercku_selector_btn_solid_gray_black"
+        android:text="@string/start"
+        android:textColor="@color/mercku_home_white"
+        android:textSize="@dimen/mercku_text_size_h16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_hint" />
+</androidx.constraintlayout.widget.ConstraintLayout>

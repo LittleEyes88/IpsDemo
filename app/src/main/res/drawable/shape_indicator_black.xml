@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/mercku_text_black" />
+    <size
+        android:width="@dimen/mercku_radius_eight"
+        android:height="@dimen/mercku_radius_eight" />
+</shape>

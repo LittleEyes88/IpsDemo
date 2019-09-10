@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_save_success"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mercku_view_height_forty_five"
+        android:background="@color/bg_gray"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="@dimen/mercku_view_height_twenty_four"
+            android:layout_height="@dimen/mercku_view_height_twenty_four"
+            android:layout_marginStart="@dimen/mercku_margin_twenty"
+            android:src="@drawable/ic_success"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/text"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/mercku_margin_ten"
+            android:layout_marginEnd="@dimen/mercku_margin_twenty"
+            android:text="@string/save_success"
+            android:textColor="@color/text_gray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/image"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.mercku.ipsdemo.view.MyLocatorView
+        android:id="@+id/layout_custom_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/mercku_margin_five"
+        android:layout_marginBottom="@dimen/mercku_margin_five"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_save_success" />
+
+    <TextView
+        android:id="@+id/text_search"
+        style="@style/mercku_TextWhiteColorSixteenSp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/mercku_margin_fifty_six"
+        android:layout_marginStart="@dimen/mercku_margin_thirty"
+        android:layout_marginEnd="@dimen/mercku_margin_thirty"
+        android:layout_marginBottom="@dimen/mercku_margin_fifty"
+        android:background="@drawable/mercku_selector_btn_solid_gray_black"
+        android:gravity="center"
+        android:onClick="onClickSearch"
+        android:text="@string/find_sticker"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

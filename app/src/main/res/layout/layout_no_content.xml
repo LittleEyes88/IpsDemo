@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_no_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mercku_light_bg">
+
+    <ImageView
+        android:id="@+id/image_no_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/mercku_margin_ten"
+        android:src="@drawable/img_default_empty"
+        app:layout_constraintBottom_toTopOf="@+id/text_no_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/text_no_content"
+        style="@style/mercku_TextBlackColorFourteenSp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/mercku_margin_twenty"
+        android:text="@string/no_house"
+        app:layout_constraintBottom_toTopOf="@+id/text_add"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/text_add"
+        style="@style/mercku_TextWhiteColorSixteenSp"
+        android:layout_width="100dp"
+        android:layout_height="36dp"
+        android:background="@drawable/mercku_selector_btn_solid_gray_black"
+        android:gravity="center"
+        android:onClick="onClickAdd"
+        android:text="@string/upload_house_plan"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

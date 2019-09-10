@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">IPS Demo</string>
+    <string name="merkcu_trans0269">You have denied Mercku to use your gallery. Please authorize in Settings</string>
+    <string name="mercku_trans0270">You have denied Mercku to use your storage. Please authorize in Settings</string>
+    <string name="mercku_tag_ab_home">TAG_AB_HOME</string>
+    <string name="my_family">My home</string>
+    <string name="upload_house_plan">Upload the House plan</string>
+    <string name="no_house">Empty House list</string>
+    <string name="set_locator">Label the device location</string>
+    <string name="drap_icon">Press the red button on house and drag to the actual installation location</string>
+    <string name="text_next">Next</string>
+    <string name="set_scale">Set the scale</string>
+    <string name="save">Save</string>
+    <string name="house_hint">Adjust the size of the grid until it matches the size of your room in the real world\n\nThe length of each cell of the grid represent 1m in the real world</string>
+    <string name="my_home">My home</string>
+    <string name="choose_one_picture">Please select a picture first.</string>
+    <string name="family_list">All</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="select_all">All</string>
+    <string name="edit">Edit</string>
+    <string name="house_name">Name</string>
+    <string name="confirm">Yes</string>
+    <string name="choose_locator">Click to select Locator</string>
+    <string name="only_3_steps">Only 3 steps could achieve the whole-room indoor positioning, precisely tracking your items  for every second.</string>
+    <string name="start">Action</string>
+    <string name="ips_instance">IPS Demo</string>
+    <string name="drag_locator">Press the red button on house and drag to the actual installation location</string>
+    <string name="user_mesh_calc">Measure the size of your room using the grid</string>
+    <string name="find_sticker">Find the Sticker</string>
+    <string name="save_success">Initialization has been successful, let\'s start indoor positioning now!</string>
+    <string name="delete_hint">After deletion, you will lose all data of previous positioning and unbind with the Stickers.</string>
+
+</resources>
