@@ -61,22 +61,16 @@ class MyStickerView : BaseEditView {
 
     private fun drawHouseDetail(canvas: Canvas) {
 
-        var pointLeft = drawHouseBitmap(canvas)
-        var imgDx = 0f
-        var imgDy = 0f
-        pointLeft?.let {
-            imgDx = it.x
-            imgDy = it.y
-        }
-        var points = drawAllLocator(imgDx, imgDy, canvas)
+        drawHouseBitmap(canvas)
+        var points = drawAllLocator(canvas)
 
         //get sticker's location
         var center = MathUtil.getPolygenCenter(points)
         var curX = width / 2.0f
-        var curY = center.cy
+        var curY = height / 2.0f
 
         var stickerPoint = PointF(curX, curY)
-        drawLineWithSticker(imgDx, imgDy, stickerPoint, canvas)
+        drawLineWithSticker(stickerPoint, canvas)
         drawSticker(stickerPoint, canvas)
 
     }
@@ -91,17 +85,19 @@ class MyStickerView : BaseEditView {
         canvas.drawBitmap(stickerBitmp, matrix, paint)
     }
 
-    private fun drawLineWithSticker(imgDx: Float, imgDy: Float, curPoint: PointF, canvas: Canvas) {
+    private fun drawLineWithSticker(curPoint: PointF, canvas: Canvas) {
         var index = 0
-        var unit = mHouseDetail!!.mBitmapActualWidth / mHouseBitmap!!.width
+        var unit = mHouseDetail!!.mBitmapActualWidth / (mHouseBitmap!!.width * mTotalScaled)
         var curDisX = curPoint.x * unit
         var curDisY = curPoint.y * unit
+        var startX = width / 2f - mHouseBitmap!!.width * mTotalScaled / 2f
+        var startY = height / 2f - mHouseBitmap!!.height * mTotalScaled / 2f
         while (index < mHouseDetail!!.mData!!.size) {
             var locator = mHouseDetail!!.mData!![index]
             if (locator.mIsSelected || locator.mIsAdded) {
-                var nextX = (imgDx + mHouseBitmap!!.width * locator.mLocationActual.x)
+                var nextX = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled + mTotalDx
                 var nextDisX = nextX * unit
-                var nextY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
+                var nextY = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled + mTotalDy
                 var nextDisY = nextY * unit
                 android.util.Log.d("ryq", "drawHouseDetail2  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
                 var actualDis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())

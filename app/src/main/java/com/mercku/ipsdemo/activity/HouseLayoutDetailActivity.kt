@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.constants.ExtraConstants
+import com.mercku.ipsdemo.listener.OnViewTouchListener
 import com.mercku.ipsdemo.model.IpsHouse
 
 class HouseLayoutDetailActivity : BaseContentActivity() {
@@ -24,7 +25,7 @@ class HouseLayoutDetailActivity : BaseContentActivity() {
         if (intent.getBooleanExtra(ExtraConstants.EXTRA_IS_SAVE, false)) {
             mSaveSuccessLayout.visibility = View.VISIBLE
         }
-
+       // mCustomView.setOnTouchListener(OnViewTouchListener(mCustomView))
         mIpsHouse = intent.getParcelableExtra<IpsHouse>(ExtraConstants.EXTRA_HOUSE_DETAIL)
         if (mIpsHouse == null) {
             return

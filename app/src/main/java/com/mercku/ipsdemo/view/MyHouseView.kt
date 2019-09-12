@@ -115,14 +115,8 @@ class MyHouseView : BaseEditView {
 
     private fun drawHouseDetail(canvas: Canvas) {
 
-        var pointLeft = drawHouseBitmap(canvas)
-        var imgDx = 0f
-        var imgDy = 0f
-        pointLeft?.let {
-            imgDx = it.x
-            imgDy = it.y
-        }
-        drawAllLocator(imgDx, imgDy, canvas)
+        drawHouseBitmap(canvas)
+        drawAllLocator(canvas)
     }
 
     override fun onFinishInflate() {
@@ -134,17 +128,10 @@ class MyHouseView : BaseEditView {
              mScaleGestureDetector = ScaleGestureDetector(context, ScaleGestureListener())//设置手势缩放的监听*/
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        Log.d(BaseEditView.TAG, "onTouchEvent   event.getAction() & MotionEvent.ACTION_MASK=" + (event.action and MotionEvent.ACTION_MASK) +
-                " event.getX=" + event.x + " event.getY=" + event.y +
-                " event.getRawX=" + event.rawX + " event.getRawY=" + event.rawY +
-                " getScrollX=" + scrollX + " event.getScaleY=" + scaleY +
-                " event.getActionMasked()=" + event.actionMasked)
-        /*if (event.getPointerCount() > 1) {
-            mScaleGestureDetector.onTouchEvent(event);
-            return true;
-        }*/
-
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event == null) {
+            return super.onTouchEvent(event)
+        }
 
         mCurrentX = event.x
         mCurrentY = event.y

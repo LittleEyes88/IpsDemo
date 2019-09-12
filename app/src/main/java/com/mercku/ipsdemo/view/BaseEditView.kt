@@ -3,9 +3,11 @@ package com.mercku.ipsdemo.view
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
+import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Scroller
@@ -15,6 +17,7 @@ import com.mercku.ipsdemo.MyMatrix
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.IpsHouse
 import com.mercku.ipsdemo.util.BitmapUtil
+import com.mercku.ipsdemo.util.MathUtil
 import java.io.File
 
 import java.util.AbstractList
@@ -24,6 +27,8 @@ import java.util.ArrayList
  * Created by yanqiong.ran on 2019-08-01.
  */
 open class BaseEditView : View {
+    private var mImgMatrix: Matrix? = null
+    private var mLocatorMatrix: Matrix? = null
     protected var mScrolledY: Float = 0f
     protected var mScrolledX: Float = 0f
     protected lateinit var mScroller: Scroller
@@ -59,6 +64,9 @@ open class BaseEditView : View {
     protected var mZoomMidPoint = PointF(0f, 0f)
     protected var mMultiTouchOrgDis: Float = 0.toFloat()
     protected var mTotalScaled = 1f
+    protected var mCurrentScaled = 1f
+    protected var mImgDx = 0f
+    protected var mImgDy = 0f
     protected var mScaled = 0f
     protected lateinit var mWallCornerPaint: Paint
 
@@ -120,13 +128,22 @@ open class BaseEditView : View {
 
         mLinePaint = Paint(/*Paint.ANTI_ALIAS_FLAG*/);
         mLinePaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
-        mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red, null))
+        } else {
+            mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red))
+        }
         mLinePaint.setStrokeWidth(3f);//线条宽度
         mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(5.0f, 6.0f), 0f));//线的显示效果：破折号格式
 
 
         mGridPaint = Paint()
         mGridPaint.color = resources.getColor(R.color.bg_grid_red)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mGridPaint.setColor(getResources().getColor(R.color.bg_grid_red, null))
+        } else {
+            mGridPaint.setColor(getResources().getColor(R.color.bg_grid_red))
+        }
         mGridPaint.strokeJoin = Paint.Join.ROUND
         mGridPaint.strokeCap = Paint.Cap.ROUND
         mGridPaint.strokeWidth = 1f
@@ -159,7 +176,6 @@ open class BaseEditView : View {
         var paint = Paint()
         paint.isAntiAlias = true
 
-        Log.d(BaseEditView.TAG, "drawHouseDetail canvas mHouseBitmap=" + mHouseBitmap)
         if (mHouseDetail == null || TextUtils.isEmpty(mHouseDetail!!.mImageFilePath)) {
             return null
         }
@@ -172,28 +188,56 @@ open class BaseEditView : View {
                 mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
             }
         }
+        Log.d("ryq", "drawAllLocator  mTotalScaled=" + mTotalScaled +
+                " mCurrentScaled=" + mCurrentScaled +
+                "   mTotalDx=" + mTotalDx + " mTotalDy=" + mTotalDy +
+                " pivotX=" + pivotX + " pivotY=" + pivotY)
 
-        var imgMatrix = Matrix()
-        var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
-        var imgDy = height / 3.0f - mHouseBitmap!!.height / 2.0f
-        imgMatrix.preTranslate(imgDx, imgDy)
-        canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
+        if (mImgMatrix == null) {
+            mImgMatrix = Matrix()
+            mImgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
+            mImgDy = height / 2.0f - mHouseBitmap!!.height / 2.0f
+            mImgMatrix?.preTranslate(mImgDx, mImgDy)
+        } else if (MODE_DRAG == mMode) {
+            /**只有在拖拉过程中用postTranslate,基于之前的位移操作进行变换,不会清除之前的位移。
+             * setTranslate会清除之前的位移。postTranslate和preTranslate是基于之前的操作变化，不会清除之前的位移。
+             * postTranslate： M' = T(dx, dy) * M
+             * preTranslate：M' = M * T(dx, dy)
+             *  且setTranslate会清除之前的位移和setScale不可同时使用
+             */
+            mImgMatrix?.postTranslate(mCurrentDx, mCurrentDy)
+        } else if (MODE_ZOOM == mMode) {
+            //只有在缩放过程中可以用postScale， 基于之前的缩放操作进行变换
+            mImgMatrix?.postScale(mCurrentScaled, mCurrentScaled, mHouseBitmap!!.width / 2f, mHouseBitmap!!.height / 2f)
+        }
+
+
+        canvas.drawBitmap(mHouseBitmap, mImgMatrix, paint)
 
         var point = PointF()
-        point.x = imgDx
-        point.y = imgDy
+        point.x = mImgDx
+        point.y = mImgDy
         return point
     }
+    /**
+     * 此时pivotX=0.0 pivotY=0.0
+     */
+    /* override fun onFinishInflate() {
+         super.onFinishInflate()
+         pivotX = width / 2.0f
+         pivotY = height / 2.0f
+     }*/
 
     /**
      *
      */
-    fun drawAllLocator(startX: Float, startY: Float, canvas: Canvas): ArrayList<PointF>? {
+    fun drawAllLocator(canvas: Canvas): ArrayList<PointF>? {
         var paint = Paint()
         paint.isAntiAlias = true
         if (mHouseDetail == null || mHouseDetail!!.mData == null) {
             return null
         }
+
         var index = 0
         if (mDotBitmap == null) {
             val temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
@@ -201,17 +245,46 @@ open class BaseEditView : View {
         }
         var points = ArrayList<PointF>(mHouseDetail!!.mData!!.size)
         //draw locators
+        var startX = width / 2f - mHouseBitmap!!.width * mTotalScaled / 2f
+        var startY = height / 2f - mHouseBitmap!!.height * mTotalScaled / 2f
+
+        Log.d("ryq", "drawAllLocator  mHouseBitmap!!.width=" + mHouseBitmap!!.width +
+                "   mHouseBitmap!!.height =" + mHouseBitmap!!.height
+                + " width=" + width + " height=" + height
+                + " startX=" + startX
+                + " startY=" + startY)
         while (index < mHouseDetail!!.mData!!.size) {
             var locator = mHouseDetail!!.mData!![index]
             if (locator.mIsSelected || locator.mIsAdded) {
-
+                Log.d("ryq", "drawAllLocator  mTotalScaled=" + mTotalScaled +
+                        " mCurrentScaled=" + mCurrentScaled +
+                        "   mTotalDx=" + mTotalDx + " mTotalDy=" + mTotalDy +
+                        " pivotX=" + pivotX + " pivotY=" + pivotY)
                 var matrix = Matrix()
-                var transx = startX + mHouseBitmap!!.width * locator.mLocationActual.x
-                var transy = startY + mHouseBitmap!!.height * locator.mLocationActual.y
+                var transx = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled + mTotalDx
+                var transy = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled + mTotalDy
 
                 var point = PointF(transx, transy)
                 points.add(point)
-                matrix.preTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+                matrix!!.preTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+
+                /* if (mLocatorMatrix == null) {
+                     mLocatorMatrix = Matrix()
+                     mLocatorMatrix!!.preTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+                 } else if (MODE_DRAG == mMode) {
+                     */
+                /**只有在拖拉过程中用postTranslate,基于之前的位移操作进行变换,不会清除之前的位移。
+                 * setTranslate会清除之前的位移。postTranslate和preTranslate是基于之前的操作变化，不会清除之前的位移。
+                 * postTranslate： M' = T(dx, dy) * M
+                 * preTranslate：M' = M * T(dx, dy)
+                 *  且setTranslate会清除之前的位移和setScale不可同时使用
+                 *//*
+                    mImgMatrix?.postTranslate(mCurrentDx, mCurrentDy)
+                } else if (MODE_ZOOM == mMode) {
+                    //只有在缩放过程中可以用postScale， 基于之前的缩放操作进行变换
+                    mImgMatrix?.postScale(mCurrentScaled, mCurrentScaled, mHouseBitmap!!.width / 2f, mHouseBitmap!!.height / 2f)
+                }*/
+
 
                 canvas.drawBitmap(mDotBitmap, matrix, paint)
             }
@@ -290,5 +363,95 @@ open class BaseEditView : View {
         val DEFAULT_DOT_RADIUS = 20f
         val MESH_ROW_DISTANCE = 0.5f
         val MESH_COL_DISTANCE = 0.5f
+        /**
+         * 拖拉模式
+         */
+        private val MODE_DRAG = 1
+        /**
+         * 放大缩小模式
+         */
+        private val MODE_ZOOM = 2
     }
+
+    /**
+     * 记录是放大缩小模式还是拖拉模式
+     */
+    var mMode = 0// 初始状态
+    /**
+     * 用于记录开始时候的坐标位置
+     */
+    var mTotalDx = 0f
+    var mTotalDy = 0f
+    var mCurrentDx = 0f
+    var mCurrentDy = 0f
+    val mStartPoint = PointF()
+    val mLastPoint = PointF()
+    /**
+     * 两个手指的开始距离
+     */
+    var mStartDis: Float = 0.toFloat()
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+
+        /** 通过与运算保留最后八位 MotionEvent.ACTION_MASK = 255  */
+        when (event?.action?.and(MotionEvent.ACTION_MASK)) {
+            // 手指压下屏幕
+            MotionEvent.ACTION_DOWN -> {
+                mMode = MODE_DRAG
+                // 记录ImageView当前的移动位置
+                //mCurrentMatrix.set(mImageView.imageMatrix)
+                mStartPoint.set(event.x, event.y)
+                mLastPoint.set(event.x, event.y)
+            }
+            // 当屏幕上已经有触点(手指)，再有一个触点压下屏幕
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                mMode = MODE_ZOOM
+                /** 计算两个手指间的距离  */
+                mStartDis = MathUtil.distance(event.getX(1), event.getY(1), event.getX(0), event.getY(0))// 结束距离
+                android.util.Log.d("ryq", "drawBackground  mStartDis=$mStartDis")
+            }
+            // 手指在屏幕上移动，改事件会被不断触发
+            MotionEvent.ACTION_MOVE ->
+                // 拖拉图片
+                if (mMode == MODE_DRAG) {
+
+                    //val dx = event.x - mStartPoint.x // 得到x轴的移动距离
+                    //val dy = event.y - mStartPoint.y // 得到x轴的移动距离
+                    // 在没有移动之前的位置上进行移动
+
+                    mCurrentDx = event.x - mLastPoint.x
+                    mCurrentDy = event.y - mLastPoint.y
+                    mLastPoint.set(event.x, event.y)
+
+                    mTotalDx += mCurrentDx
+                    mTotalDy += mCurrentDy
+                    //mImgDx += mCurrentDx
+                    //mImgDy += mCurrentDy
+
+                    invalidate()
+
+                } else if (mMode == MODE_ZOOM) {
+                    val endDis = MathUtil.distance(event.getX(1), event.getY(1), event.getX(0), event.getY(0))// 结束距离
+                    android.util.Log.d("ryq", "drawBackground  endDis=$endDis")
+                    if (endDis > 10f) { // 两个手指并拢在一起的时候像素大于10
+                        // val scale = endDis / mStartDis// 得到缩放倍数
+                        mCurrentScaled = endDis / mStartDis
+                        if (mTotalScaled * mCurrentScaled > 0.5 && mTotalScaled * mCurrentScaled < 5) {
+                            mTotalScaled *= mCurrentScaled
+                            mStartDis = endDis
+                            invalidate()
+                        }
+
+
+                    }
+                }// 放大缩小图片
+            // 手指离开屏幕
+            MotionEvent.ACTION_UP,
+                // 当触点离开屏幕，但是屏幕上还有触点(手指)
+            MotionEvent.ACTION_POINTER_UP -> mMode = 0
+        }
+
+        return true
+    }
+
 }
