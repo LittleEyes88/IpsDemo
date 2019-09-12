@@ -205,4 +205,15 @@ public class MathUtil {
         return (y2 - y1) / (x2 - x1);
     }
 
+    public static PointF getCenterOfPoint(List<PointF> pointFList) {
+
+        Float sumX = 0.0f, sumY = 0.0f;// 重心的x、y
+        for (int i = 0; i < pointFList.size(); i++) {
+
+            sumX += pointFList.get(i).x;
+            sumY += pointFList.get(i).y;
+        }
+        return new PointF(sumX / pointFList.size(), sumY / pointFList.size());
+    }
+
 }

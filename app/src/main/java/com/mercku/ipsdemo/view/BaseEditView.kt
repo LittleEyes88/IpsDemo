@@ -3,26 +3,21 @@ package com.mercku.ipsdemo.view
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
-import android.os.Build
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
-import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Scroller
 import androidx.core.content.ContextCompat
-
-import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.MyMatrix
-import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.util.MathUtil
 import java.io.File
+import java.util.*
 
-import java.util.AbstractList
-import java.util.ArrayList
 
 /**
  * Created by yanqiong.ran on 2019-08-01.
@@ -73,10 +68,12 @@ abstract class BaseEditView : View {
     protected val DEFAULT_DOT_RADIUS = 20f
     protected val DEFAULT_CORNER_RADIUS = 20f
 
-
     protected var mHouseDetail: IpsHouse? = null
     protected var mHouseBitmap: Bitmap? = null
     protected var mDotBitmap: Bitmap? = null
+    protected var mMatrixValues = FloatArray(9)
+    private var mPointF = PointF()
+
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -121,19 +118,18 @@ abstract class BaseEditView : View {
         mTextPaint.color = Color.BLACK
         mTextPaint.style = Paint.Style.FILL
         mTextPaint.isAntiAlias = true//用于防止边缘的锯齿
-        mTextPaint.textSize = context.resources.getDimensionPixelSize(R.dimen.mercku_text_size_h14).toFloat()
+        mTextPaint.textSize = context.resources.getDimensionPixelSize(com.mercku.ipsdemo.R.dimen.mercku_text_size_h14).toFloat()
         mTextPaint.alpha = 1000//设置透明度
 
-
-        mLinePaint = Paint(/*Paint.ANTI_ALIAS_FLAG*/);
-        mLinePaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
-        mLinePaint.color = ContextCompat.getColor(mContext, R.color.bg_grid_red)
-        mLinePaint.setStrokeWidth(3f);//线条宽度
-        mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(5.0f, 6.0f), 0f));//线的显示效果：破折号格式
+        mLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mLinePaint.setStyle(Paint.Style.STROKE)//画线条，线条有宽度
+        mLinePaint.color = ContextCompat.getColor(mContext, com.mercku.ipsdemo.R.color.bg_grid_red)
+        mLinePaint.setStrokeWidth(10f);//线条宽度
+        mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(20.0f, 10.0f), 0f));//线的显示效果：破折号格式
 
 
         mGridPaint = Paint()
-        mGridPaint.color = ContextCompat.getColor(mContext, R.color.bg_grid_red)
+        mGridPaint.color = ContextCompat.getColor(mContext, com.mercku.ipsdemo.R.color.bg_grid_red)
         mGridPaint.strokeJoin = Paint.Join.ROUND
         mGridPaint.strokeCap = Paint.Cap.ROUND
         mGridPaint.strokeWidth = 1f
@@ -231,35 +227,32 @@ abstract class BaseEditView : View {
 
         var index = 0
         if (mDotBitmap == null) {
-            val temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
+            val temp = BitmapFactory.decodeResource(resources, com.mercku.ipsdemo.R.drawable.ic_location)
             mDotBitmap = Bitmap.createBitmap(temp)
         }
         var points = ArrayList<PointF>(mHouseDetail!!.mData!!.size)
-        //draw locators
-        var startX = getImgLeftAfterTransOrScale()
-        var startY = getImgTopAfterTransOrScale()
-
+        mImgMatrix!!.getValues(mMatrixValues)
+        val scaleX = mMatrixValues[Matrix.MSCALE_X]
+        val transX = mMatrixValues[Matrix.MTRANS_X]
+        val scaleY = mMatrixValues[Matrix.MSCALE_Y]
+        val transY = mMatrixValues[Matrix.MTRANS_Y]
         while (index < mHouseDetail!!.mData!!.size) {
             var locator = mHouseDetail!!.mData!![index]
             if (locator.mIsSelected || locator.mIsAdded) {
-                var matrix = Matrix()
-                var transx = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled
-                var transy = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled
-                android.util.Log.d("ryq", " drawAllLocator index=" + index
-                        + " locator.mLocationActual.x=" + locator.mLocationActual.x
-                        + " locator.mLocationActual.y=" + locator.mLocationActual.y
-                        + " transx=" + transx
-                        + " transy=" + transy)
-                var point = PointF(transx, transy)
-                points.add(point)
-                matrix.setTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+                val srcX = mHouseBitmap!!.width * locator.mLocationActual.x - mDotBitmap!!.width / 2
+                val srcY = mHouseBitmap!!.height * locator.mLocationActual.y - mDotBitmap!!.height / 2
+                // 变化后的点
+                val x = srcX * scaleX + 1 * transX
+                val y = srcY * scaleY + 1 * transY
                 mDotBitmap?.let {
-                    canvas.drawBitmap(it, matrix, paint)
+                    canvas.drawBitmap(it, x, y, paint)
                 }
-
+                val point = PointF()
+                point.x = x + mDotBitmap!!.width / 2
+                point.y = y + mDotBitmap!!.height / 2
+                points.add(point)
             }
             index++
-
         }
         return points
     }
