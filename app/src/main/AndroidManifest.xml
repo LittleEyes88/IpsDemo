@@ -34,9 +34,11 @@
             android:label="@string/set_scale" />
         <activity
             android:name=".activity.HouseLayoutDetailActivity"
+            android:hardwareAccelerated="false"
             android:label="@string/my_family" />
         <activity
             android:name=".activity.SearchResultActivity"
+            android:hardwareAccelerated="false"
             android:label="@string/my_family" />
         <activity
             android:name=".activity.SurfaceViewActivity"

@@ -23,7 +23,7 @@ class MyLocatorView : BaseEditView {
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawColor(Color.BLUE)
+        canvas.drawColor(Color.WHITE)
         drawHouseDetail(canvas)
     }
 

@@ -115,17 +115,20 @@ abstract class BaseEditView : View {
         mFocusedSidePaint.alpha = 1000//设置透明度
 
         mTextPaint = Paint()
-        mTextPaint.color = Color.BLACK
+        mTextPaint.color = Color.WHITE
         mTextPaint.style = Paint.Style.FILL
         mTextPaint.isAntiAlias = true//用于防止边缘的锯齿
         mTextPaint.textSize = context.resources.getDimensionPixelSize(com.mercku.ipsdemo.R.dimen.mercku_text_size_h14).toFloat()
         mTextPaint.alpha = 1000//设置透明度
+        mTextPaint.setTypeface(Typeface.DEFAULT_BOLD)
+        mTextPaint.setShadowLayer(  15f ,0f,0f,ContextCompat.getColor(mContext, com.mercku.ipsdemo.R.color.bg_grid_red));
+
 
         mLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mLinePaint.setStyle(Paint.Style.STROKE)//画线条，线条有宽度
         mLinePaint.color = ContextCompat.getColor(mContext, com.mercku.ipsdemo.R.color.bg_grid_red)
-        mLinePaint.setStrokeWidth(10f);//线条宽度
-        mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(20.0f, 10.0f), 0f));//线的显示效果：破折号格式
+        mLinePaint.setStrokeWidth(6f);//线条宽度
+        mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(16.0f, 10.0f), 0f));//线的显示效果：破折号格式
 
 
         mGridPaint = Paint()
