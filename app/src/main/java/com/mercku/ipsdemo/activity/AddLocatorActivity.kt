@@ -95,13 +95,13 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
     }
 
     private fun initHouseLayout() {
-        val filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
-        Log.d("ryq", "AddLocatorActivity  filePath=$filePath")
-        val file = File(filePath)
+
+        var filePath = intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)
+        var file = File(filePath)
         if (file.exists()) {
-            val uri = Uri.fromFile(file)
-            mBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
-            Log.d("ryq", " mBitmap!!.width=" + mBitmap!!.width + "  mBitmap!!.height=" + mBitmap!!.height)
+            var uri = Uri.fromFile(file)
+            mBitmap = BitmapFactory.decodeStream(
+                    getContentResolver().openInputStream(uri))
             mHouseImageView.setImageBitmap(mBitmap)
         }
 
@@ -114,25 +114,11 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
                     mInitialHeight = it.height.toFloat() * scale
                     mInitialWidth = it.width * scale
                 }
-
-                Log.d("ryq", " mInitialWidth=" + mInitialWidth
-                        + " mInitialHeight=" + mInitialHeight
-                        + " mHouseImageView.width=" + mHouseImageView.width
-                        + " mHouseImageView.height=" + mHouseImageView.height)
-
-                mHouseImageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                mHouseImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this)
             }
         })
-        mHouseLayout.viewTreeObserver.addOnGlobalLayoutListener(
-                object : ViewTreeObserver.OnGlobalLayoutListener {
-                    override fun onGlobalLayout() {
-                        val houseLayoutHeight = mHouseLayout.height
-                        val houseLayoutWidth = mHouseLayout.width
-                        Log.d("ryq", " houseLayoutHeight=$houseLayoutHeight houseLayoutWidth=$houseLayoutWidth")
 
-                        mHouseLayout.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    }
-                })
+
     }
 
     override fun onItemClick(position: Int, viewId: Int) {
@@ -209,13 +195,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         }
         locatorTextView.text = locator.mName
 
-        dotView.setOnTouchListener(DotTouchListener(dotView, locator, this, this))
-        Log.d("ryq", "addDotToHouse mHouseLayout.childCount=" + mHouseLayout.childCount
-                + " mHouseImageView.width=" + mHouseImageView.width + " mHouseImageView.height=" + mHouseImageView.height)
-        Log.d("ryq", " mHouseImageView.measuredWidth=" + mHouseImageView.measuredWidth
-                + " mHouseImageView.measuredHeight=" + mHouseImageView.measuredHeight
-                + " mHouseImageView.translationX=" + mHouseImageView.translationX
-                + " mHouseImageView.translationY=" + mHouseImageView.translationY)
+        dotView!!.setOnTouchListener(DotTouchListener(dotView!!, locator, this, this))
 
         dotView.measure(0, 0)
         dotView.x = mHouseLayout.width / 2.0f - dotView.measuredWidth / 2.0f + mHouseImageView.translationX
@@ -224,8 +204,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
         dotView.tag = locator
 
         mHouseLayout.addView(dotView)
-        Log.d("ryq", " dotView.x=" + dotView.x + " dotView.y=" + dotView.y)
-        Log.d("ryq", "mHouseLayout.pivotX=" + mHouseLayout.pivotX + " mHouseLayout.pivotY=" + mHouseLayout.pivotY)
+
     }
 
     override fun onFinish(dx: Float, dy: Float, id: String, targetView: View) {
@@ -246,7 +225,7 @@ class AddLocatorActivity : BaseContentActivity(), OnItemClickListener, OnDotMove
     override fun onClickRightTitleView() {
         intent.getStringExtra(ExtraConstants.EXTRA_FILE_PATH)?.let {
             stopAnim()
-            Log.d("ryq", "onClickRightTitleView  filePath=$it")
+
             // calculateEveryDotLocation()
             val house = IpsHouse(mData, resources.getString(R.string.my_home), System.currentTimeMillis().toString(), it)
             val intent = Intent(this, SurfaceViewActivity::class.java)

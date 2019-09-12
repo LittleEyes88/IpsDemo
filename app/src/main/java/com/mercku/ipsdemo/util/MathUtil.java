@@ -142,8 +142,8 @@ public class MathUtil {
 
         return null;
     }
-    // 计算两点之间的距离
 
+    // 计算两点之间的距离
     public static float distance(float x1, float y1, float x2, float y2) {
         double lineLength = 0;
         lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
