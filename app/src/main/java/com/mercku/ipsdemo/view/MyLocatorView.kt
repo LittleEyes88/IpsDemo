@@ -82,6 +82,32 @@ class MyLocatorView : BaseEditView {
 
     }
 
+    override fun getImgInitialLeft(): Float {
+        var left = (width / 2.0f - mHouseBitmap!!.width / 2.0f)
+        android.util.Log.d("ryq", " getImgInitialLeft left=" + left)
+        return left
+    }
+
+    override fun getImgInitialTop(): Float {
+        var top = (height / 3.0f - mHouseBitmap!!.height / 2.0f)
+        android.util.Log.d("ryq", " getImgInitialTop top=" + top)
+        return top
+    }
+
+    override fun getImgLeftAfterTransOrScale(): Float {
+        var left = (width / 2f - mHouseBitmap!!.width * mTotalScaled / 2f) + mTotalDx
+        android.util.Log.d("ryq", " getImgLeftAfterTransOrScale left=" + left)
+        return left
+
+    }
+
+    override fun getImgTopAfterTransOrScale(): Float {
+        var top = height / 3f - mHouseBitmap!!.height * mTotalScaled / 2f + mTotalDy
+        android.util.Log.d("ryq", " getImgLeftAfterTransOrScale top=" + top)
+        return top
+
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         mHouseBitmap?.recycle()

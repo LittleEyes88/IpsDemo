@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Scroller
+import androidx.core.content.ContextCompat
 
 import com.mercku.ipsdemo.model.Node
 import com.mercku.ipsdemo.MyMatrix
@@ -26,7 +27,7 @@ import java.util.ArrayList
 /**
  * Created by yanqiong.ran on 2019-08-01.
  */
-open class BaseEditView : View {
+abstract class BaseEditView : View {
     private var mImgMatrix: Matrix? = null
     private var mLocatorMatrix: Matrix? = null
     protected var mScrolledY: Float = 0f
@@ -126,22 +127,13 @@ open class BaseEditView : View {
 
         mLinePaint = Paint(/*Paint.ANTI_ALIAS_FLAG*/);
         mLinePaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red, null))
-        } else {
-            mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red))
-        }
+        mLinePaint.color = ContextCompat.getColor(mContext, R.color.bg_grid_red)
         mLinePaint.setStrokeWidth(3f);//线条宽度
         mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(5.0f, 6.0f), 0f));//线的显示效果：破折号格式
 
 
         mGridPaint = Paint()
-        mGridPaint.color = resources.getColor(R.color.bg_grid_red)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mGridPaint.setColor(getResources().getColor(R.color.bg_grid_red, null))
-        } else {
-            mGridPaint.setColor(getResources().getColor(R.color.bg_grid_red))
-        }
+        mGridPaint.color = ContextCompat.getColor(mContext, R.color.bg_grid_red)
         mGridPaint.strokeJoin = Paint.Join.ROUND
         mGridPaint.strokeCap = Paint.Cap.ROUND
         mGridPaint.strokeWidth = 1f
@@ -186,7 +178,8 @@ open class BaseEditView : View {
                 mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
             }
         }
-
+        Log.d("ryq", " mHouseBitmap!!.width=" + mHouseBitmap!!.width + "  mHouseBitmap!!.height=" + mHouseBitmap!!.height
+                + " width=" + width + " height=" + height)
         if (mImgMatrix == null) {
             mImgMatrix = Matrix()
             mImgMatrix?.preTranslate(getImgInitialLeft(), getImgInitialTop())
@@ -203,28 +196,19 @@ open class BaseEditView : View {
             mImgMatrix?.postScale(mCurrentScaled, mCurrentScaled, mHouseBitmap!!.width / 2f, mHouseBitmap!!.height / 2f)
         }
 
-        canvas.drawBitmap(mHouseBitmap, mImgMatrix, paint)
+        if (mHouseBitmap != null && mImgMatrix != null) {
+            canvas.drawBitmap(mHouseBitmap!!, mImgMatrix!!, paint)
+        }
 
     }
 
-    fun getImgInitialLeft(): Float {
-        return (width / 2.0f - mHouseBitmap!!.width / 2.0f)
-    }
+    abstract fun getImgInitialLeft(): Float
 
-    fun getImgInitialTop(): Float {
-        return (height / 2.0f - mHouseBitmap!!.height / 2.0f)
-    }
+    abstract fun getImgInitialTop(): Float
 
+    abstract fun getImgLeftAfterTransOrScale(): Float
 
-    fun getImgLeftAfterTransOrScale(): Float {
-        return (width / 2f - mHouseBitmap!!.width * mTotalScaled / 2f) + mTotalDx
-
-    }
-
-    fun getImgTopAfterTransOrScale(): Float {
-        return height / 2f - mHouseBitmap!!.height * mTotalScaled / 2f + mTotalDy
-
-    }
+    abstract fun getImgTopAfterTransOrScale(): Float
 
     /**
      * 此时pivotX=0.0 pivotY=0.0
@@ -261,12 +245,18 @@ open class BaseEditView : View {
                 var matrix = Matrix()
                 var transx = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled
                 var transy = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled
-
+                android.util.Log.d("ryq", " drawAllLocator index=" + index
+                        + " locator.mLocationActual.x=" + locator.mLocationActual.x
+                        + " locator.mLocationActual.y=" + locator.mLocationActual.y
+                        + " transx=" + transx
+                        + " transy=" + transy)
                 var point = PointF(transx, transy)
                 points.add(point)
-                matrix!!.preTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+                matrix.setTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+                mDotBitmap?.let {
+                    canvas.drawBitmap(it, matrix, paint)
+                }
 
-                canvas.drawBitmap(mDotBitmap, matrix, paint)
             }
             index++
 
