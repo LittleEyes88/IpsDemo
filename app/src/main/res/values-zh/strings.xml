@@ -30,5 +30,6 @@
     <string name="find_sticker">查找Sticker</string>
     <string name="save_success">初始化搭建已成功，开启定位之旅吧！</string>
     <string name="delete_hint">删除后定位数据将全部丢失，并解除与Sticker之间的绑定关系。</string>
-
+    <string name="scale_by_house_image">根据比例尺缩放户型图，测量房屋尺寸</string>
+    <string name="no_locator_hint">开始室内定位之前，请先上传你的房屋平面图</string>
 </resources>

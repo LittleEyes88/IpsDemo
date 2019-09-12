@@ -9,4 +9,6 @@ object RequestConstants {
 
     const val REQUEST_ALBUM = 201
 
+    const val REQUEST_NEW_HOUSE = 202
+
 }

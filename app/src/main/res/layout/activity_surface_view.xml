@@ -26,36 +26,73 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.mercku.ipsdemo.view.MySurfaceView
-        android:id="@+id/layout_surface_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_scale"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></com.mercku.ipsdemo.view.MySurfaceView>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/image_scale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_zoom_bg"
+            app:layout_constraintBottom_toTopOf="@id/image_hand"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <ImageView
+            android:id="@+id/image_hand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/mercku_margin_twenty"
+            android:src="@drawable/ic_hand_zoom"
+            app:layout_constraintBottom_toTopOf="@id/text_scale_hint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_scale" />
+
+        <TextView
+            android:id="@+id/text_scale_hint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/mercku_margin_thirty"
+            android:layout_marginTop="@dimen/mercku_margin_five"
+            android:layout_marginEnd="@dimen/mercku_margin_thirty"
+            android:gravity="center"
+            android:text="@string/scale_by_house_image"
+            android:textColor="@color/mercku_home_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_hand" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <ImageView
-        android:id="@+id/img_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/mercku_margin_thirty"
-        android:layout_marginEnd="@dimen/mercku_margin_twenty"
-        android:src="@drawable/ic_hint"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/img_hint"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="@dimen/mercku_margin_thirty"-->
+    <!--        android:layout_marginEnd="@dimen/mercku_margin_twenty"-->
+    <!--        android:src="@drawable/ic_hint"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <TextView
-        android:id="@+id/text_hint"
-        android:layout_width="@dimen/mercku_view_width_two_hundred"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/mercku_margin_twenty"
-        android:layout_marginEnd="@dimen/mercku_margin_five"
-        android:background="@drawable/img_pop_up"
-        android:padding="@dimen/mercku_margin_ten"
-        android:text="@string/house_hint"
-        android:textColor="@color/mercku_bg_dark_gray"
-        android:textSize="@dimen/mercku_text_size_h12"
-        app:layout_constraintEnd_toStartOf="@+id/img_hint"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/text_hint"-->
+    <!--        android:layout_width="@dimen/mercku_view_width_two_hundred"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="@dimen/mercku_margin_twenty"-->
+    <!--        android:layout_marginEnd="@dimen/mercku_margin_five"-->
+    <!--        android:background="@drawable/img_pop_up"-->
+    <!--        android:padding="@dimen/mercku_margin_ten"-->
+    <!--        android:text="@string/house_hint"-->
+    <!--        android:textColor="@color/mercku_bg_dark_gray"-->
+    <!--        android:textSize="@dimen/mercku_text_size_h12"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/img_hint"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>

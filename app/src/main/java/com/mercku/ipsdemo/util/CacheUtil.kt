@@ -3,7 +3,6 @@ package com.mercku.ipsdemo.util
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.mercku.ipsdemo.activity.SetHouseLayoutScaleActivity
 import com.mercku.ipsdemo.constants.ExtraConstants
 import com.mercku.ipsdemo.model.IpsHouse
 

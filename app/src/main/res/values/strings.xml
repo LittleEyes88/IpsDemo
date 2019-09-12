@@ -30,5 +30,6 @@
     <string name="find_sticker">Find the Sticker</string>
     <string name="save_success">Initialization has been successful, let\'s start indoor positioning now!</string>
     <string name="delete_hint">After deletion, you will lose all data of previous positioning and unbind with the Stickers.</string>
-
+    <string name="scale_by_house_image">Zoom the layout according to the scale to measure the size of your apartment.</string>
+    <string name="no_locator_hint">Before you start indoor positioning, upload your house plan</string>
 </resources>
