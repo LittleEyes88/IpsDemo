@@ -120,7 +120,6 @@ class HouseLayoutAdapter(mContext: Context)
                 ipsHouse.mName = mEditText!!.text.toString()
                 CacheUtil.updateSomeHouse(ipsHouse, mContext)
             }
-
         }
         mAlertDialog?.dismiss()
 

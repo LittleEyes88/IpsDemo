@@ -11,7 +11,9 @@ import com.mercku.ipsdemo.model.IpsLocator
  */
 
 
-class DotTouchListener(private val mTargetView: View, val locator: IpsLocator, val mOnDotMoveFinishListener: OnDotMoveFinishListener) : View.OnTouchListener {
+class DotTouchListener(private val mTargetView: View, private val locator: IpsLocator,
+                       private val mOnDotMoveFinishListener: OnDotMoveFinishListener,
+                       private val mOnStopAnimListener: OnStopAnimListener) : View.OnTouchListener {
 
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
@@ -28,6 +30,9 @@ class DotTouchListener(private val mTargetView: View, val locator: IpsLocator, v
      * 手指点击屏幕的触摸事件
      */
     override fun onTouch(view: View, event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            mOnStopAnimListener.stopAnim()
+        }
         /** 通过与运算保留最后八位 MotionEvent.ACTION_MASK = 255  */
         if (!locator.mIsSelected) {
             return false

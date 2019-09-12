@@ -9,6 +9,7 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.mercku.ipsdemo.R
 
 /**
@@ -195,6 +196,11 @@ open class BaseContentActivity : BaseActivity() {
         mRightImageView?.setImageResource(resId)
         mRightTitleView?.visibility = View.GONE
         mRightImageView?.setOnClickListener(onClickListener)
+    }
+
+    protected fun setRightTitleEnable(colorId: Int, isEnable: Boolean) {
+        mRightTitleView?.setTextColor(ContextCompat.getColorStateList(this, colorId))
+        mRightTitleView?.isEnabled = isEnable
     }
 }
 

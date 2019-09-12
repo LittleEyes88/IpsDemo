@@ -15,15 +15,9 @@ import com.mercku.ipsdemo.model.IpsLocator
  */
 
 
-class ImageTouchListener : View.OnTouchListener {
+class ImageTouchListener(private val mLayoutView: ViewGroup, private val mStopAnimListener: OnStopAnimListener) : View.OnTouchListener {
 
-    private lateinit var mLayoutView: ViewGroup
-    private lateinit var mImageView: ImageView
-
-    constructor(layoutView: ViewGroup) {
-        mLayoutView = layoutView
-        mImageView = mLayoutView.findViewById(R.id.image_house)
-    }
+    private val mImageView: ImageView = mLayoutView.findViewById(R.id.image_house)
 
     /**
      * 记录是拖拉照片模式还是放大缩小照片模式
@@ -64,6 +58,7 @@ class ImageTouchListener : View.OnTouchListener {
         when (event.action and MotionEvent.ACTION_MASK) {
             // 手指压下屏幕
             MotionEvent.ACTION_DOWN -> {
+                mStopAnimListener.stopAnim()
                 mMode = MODE_DRAG
                 // 记录ImageView当前的移动位置
                 //mCurrentMatrix.set(mImageView.imageMatrix)

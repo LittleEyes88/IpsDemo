@@ -5,9 +5,10 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.view.View
+import android.view.ViewStub
 import android.widget.Button
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -38,19 +39,25 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
     private lateinit var mHouseLayoutAdapter: HouseLayoutAdapter
     private lateinit var mData: ArrayList<IpsHouse>
     private lateinit var mAddNewHouseButton: Button
+    private lateinit var mViewStub: ViewStub
+    private lateinit var mAddTextView: TextView
     // private lateinit var mRecyclerView: RecyclerView
 
     //protected var mIsEditMode: Boolean = false
     //protected var mIsAllSelect: Boolean = false
-    private lateinit var mIpsInstance: IpsHouse
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mIpsInstance = IpsHouse(null, getString(R.string.ips_instance), "", "")
+        mViewStub = findViewById(R.id.view_stub_empty)
+        mViewStub.setOnInflateListener { stub, inflated ->
+            mAddTextView = inflated.findViewById(R.id.text_add)
+            mAddTextView.setOnClickListener {
+                onClickAdd(mAddTextView)
+            }
+        }
         mRecyclerView = findViewById(R.id.recycler_view)
         mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mData = ArrayList<IpsHouse>()
 
         mHouseLayoutAdapter = HouseLayoutAdapter(this)
         mHouseLayoutAdapter.setOnItemClickListener(this)
@@ -70,16 +77,18 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
         if (cachedData != null) {
             houseList = Gson().fromJson<ArrayList<IpsHouse>>(cachedData, object : TypeToken<ArrayList<IpsHouse>>() {}.type)
         }
-        if (houseList == null || houseList.isEmpty()) {
-            if (!mIsEditMode && !mData.contains(mIpsInstance)) {
-                mData = arrayListOf(mIpsInstance)
-                mHouseLayoutAdapter.setDataList(mData)
-            }
-        } else if (!mIsEditMode && !mData.contains(mIpsInstance)) {
-            houseList.add(mIpsInstance)
-            mData = houseList
-            mHouseLayoutAdapter.setDataList(mData)
+        mData = if (houseList == null || houseList.isEmpty()) {
+            mViewStub.visibility = View.VISIBLE
+            mAddNewHouseButton.visibility = View.GONE
+            mRecyclerView.visibility = View.GONE
+            arrayListOf()
+        } else {
+            mViewStub.visibility = View.GONE
+            mAddNewHouseButton.visibility = View.VISIBLE
+            mRecyclerView.visibility = View.VISIBLE
+            houseList
         }
+        mHouseLayoutAdapter.setDataList(mData)
     }
 
     override fun onHomeSelected() {
@@ -104,6 +113,9 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
         CacheUtil.saveHouseList(mData, this)
         if (mData.isEmpty()) {
             exitEditMode()
+            mViewStub.visibility = View.VISIBLE
+            mAddNewHouseButton.visibility = View.GONE
+            mRecyclerView.visibility = View.GONE
         }
     }
 
@@ -134,11 +146,6 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
         setMiddleTitleText(getString(R.string.my_family))
 
         mDoneTextView.visibility = View.GONE
-
-        if (!mData.contains(mIpsInstance)) {
-            mData.add(mIpsInstance)
-            mHouseLayoutAdapter.setDataList(mData)
-        }
     }
 
     override fun initEditMode() {
@@ -151,26 +158,13 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
         setMiddleTitleText(getString(R.string.my_family))
 
         mDoneTextView.visibility = View.VISIBLE
-        if (mData.contains(mIpsInstance)) {
-            mData.remove(mIpsInstance)
-            mHouseLayoutAdapter.setDataList(mData)
-        }
-
-    }
-
-    override fun isLongClickEnable(position: Int): Boolean {
-        return mIpsInstance != mData[position]
     }
 
     override fun onItemClick(position: Int, viewId: Int) {
         val ipsHouse = mData[position]
-        if (TextUtils.isEmpty(ipsHouse.mId) && TextUtils.isEmpty(ipsHouse.mImageFilePath)) {
-            startActivity(Intent(this, IpsInstanceActivity::class.java))
-        } else {
-            val intent = Intent(this, HouseLayoutDetailActivity::class.java)
-            intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, ipsHouse)
-            startActivity(intent)
-        }
+        val intent = Intent(this, HouseLayoutDetailActivity::class.java)
+        intent.putExtra(ExtraConstants.EXTRA_HOUSE_DETAIL, ipsHouse)
+        startActivity(intent)
     }
 
 
@@ -205,7 +199,7 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
     }
 
     private fun startChoosePictureActivityForResult() {
-        val albumIntent = Intent(Intent.ACTION_PICK);
+        val albumIntent = Intent(Intent.ACTION_PICK)
         albumIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
         startActivityForResult(albumIntent, RequestConstants.REQUEST_ALBUM)
 
@@ -217,11 +211,6 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
             when (requestCode) {
                 RequestConstants.REQUEST_ALBUM -> {
                     val bundle = data?.extras
-                    android.util.Log.d("ryq", "onActivityResult  bundle=" + bundle)
-                    if (bundle != null) {
-                        //  var bitmap = bundle!!.getParcelable ("data");
-
-                    }
                     data?.data?.let {
                         val filePath = FileUtil.getPathFromUri(it, this@MainActivity)
                         val intent = Intent(this, AddLocatorActivity::class.java)

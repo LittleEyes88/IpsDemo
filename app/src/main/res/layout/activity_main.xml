@@ -5,15 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/mercku_light_bg_gray"
-    android:paddingStart="@dimen/mercku_margin_twenty"
-    android:paddingTop="@dimen/mercku_margin_ten"
-    android:paddingEnd="@dimen/mercku_margin_twenty"
     tools:context=".activity.MainActivity">
+
+    <ViewStub
+        android:id="@+id/view_stub_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/layout_no_content" />
 
     <Button
         android:id="@+id/btn_new_house"
         android:layout_width="match_parent"
         android:layout_height="@dimen/mercku_view_height_fifty_two"
+        android:layout_marginStart="@dimen/mercku_margin_twenty"
+        android:layout_marginEnd="@dimen/mercku_margin_twenty"
         android:layout_marginBottom="@dimen/mercku_margin_fifty"
         android:background="@drawable/mercku_selector_btn_solid_gray_black"
         android:onClick="onClickAdd"
@@ -29,6 +34,9 @@
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/mercku_margin_twenty"
         android:layout_marginBottom="@dimen/mercku_margin_one_hundred_ten"
+        android:paddingStart="@dimen/mercku_margin_twenty"
+        android:paddingTop="@dimen/mercku_margin_ten"
+        android:paddingEnd="@dimen/mercku_margin_twenty"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -38,11 +46,16 @@
         android:id="@+id/text_done"
         style="@style/mercku_TextWhiteColorSixteenSp"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/mercku_margin_fifty"
+        android:layout_height="@dimen/mercku_view_height_fifty_two"
+        android:layout_marginStart="@dimen/mercku_margin_twenty"
+        android:layout_marginEnd="@dimen/mercku_margin_twenty"
         android:layout_marginBottom="@dimen/mercku_margin_fifty"
         android:background="@drawable/mercku_selector_btn_solid_gray_black"
         android:gravity="center"
+        android:paddingStart="@dimen/mercku_margin_twenty"
+        android:paddingEnd="@dimen/mercku_margin_twenty"
         android:text="@string/delete"
+        android:textSize="@dimen/mercku_text_size_h16"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
