@@ -79,7 +79,7 @@ class MyStickerView : BaseEditView {
         var stickerTemp = BitmapFactory.decodeResource(resources, R.drawable.ic_sticker)
         var stickerBitmp = Bitmap.createBitmap(stickerTemp);
         var matrix = Matrix()
-        matrix.preTranslate(stickerPoint.x - stickerBitmp.width / 2 /*+ temp.width / 2*/, stickerPoint.y - stickerBitmp.height / 2 /*+ temp.height / 2*/)
+        matrix.preTranslate(stickerPoint.x - stickerBitmp.width / 2, stickerPoint.y - stickerBitmp.height / 2)
         var paint = Paint()
         paint.isAntiAlias = true
         canvas.drawBitmap(stickerBitmp, matrix, paint)
@@ -90,24 +90,24 @@ class MyStickerView : BaseEditView {
         var unit = mHouseDetail!!.mBitmapActualWidth / (mHouseBitmap!!.width * mTotalScaled)
         var curDisX = curPoint.x * unit
         var curDisY = curPoint.y * unit
-        var startX = width / 2f - mHouseBitmap!!.width * mTotalScaled / 2f
-        var startY = height / 2f - mHouseBitmap!!.height * mTotalScaled / 2f
+        var startX = getImgLeftAfterTransOrScale()
+        var startY = getImgTopAfterTransOrScale()
         while (index < mHouseDetail!!.mData!!.size) {
             var locator = mHouseDetail!!.mData!![index]
             if (locator.mIsSelected || locator.mIsAdded) {
-                var nextX = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled + mTotalDx
+                var nextX = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled
                 var nextDisX = nextX * unit
-                var nextY = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled + mTotalDy
+                var nextY = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled
                 var nextDisY = nextY * unit
-                android.util.Log.d("ryq", "drawHouseDetail2  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
-                var actualDis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
-                var pixDis = Math.sqrt(((curPoint.x - nextX) * (curPoint.x - nextX) + (curPoint.y - nextY) * (curPoint.y - nextY)).toDouble())
+                var actualDis = MathUtil.distance(curDisX, curDisY, nextDisX, nextDisY)
+                var pixDis = MathUtil.distance(curPoint.x, curPoint.y, nextX, nextY)
+
                 canvas.drawLine(curPoint.x, curPoint.y, nextX, nextY, mLinePaint)
+
                 var path = Path()
                 path.moveTo(curPoint.x, curPoint.y)
                 path.lineTo(nextX, nextY)
                 //距离有问题，可能因为坐标错误
-                android.util.Log.d("ryq", "drawHouseDetail2  dis=" + actualDis + " pixDis=" + pixDis)
                 var disStr: String = String.format("%.1f", actualDis)
                 canvas.drawTextOnPath(disStr + "m", path, (pixDis / 2).toFloat(), 0f, mTextPaint)
             }
