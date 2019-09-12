@@ -2,18 +2,24 @@ package com.mercku.ipsdemo.view
 
 import android.content.Context
 import android.graphics.*
+import android.net.Uri
+import android.os.Build
+import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.Scroller
+import androidx.core.content.ContextCompat
 
-import com.mercku.ipsdemo.model.FreeRoom
 import com.mercku.ipsdemo.model.Node
-import com.mercku.ipsdemo.model.RectRoom
 import com.mercku.ipsdemo.MyMatrix
 import com.mercku.ipsdemo.R
 import com.mercku.ipsdemo.model.IpsHouse
+import com.mercku.ipsdemo.util.BitmapUtil
 import com.mercku.ipsdemo.util.MathUtil
+import java.io.File
 
 import java.util.AbstractList
 import java.util.ArrayList
@@ -21,7 +27,9 @@ import java.util.ArrayList
 /**
  * Created by yanqiong.ran on 2019-08-01.
  */
-open class BaseEditView : View {
+abstract class BaseEditView : View {
+    private var mImgMatrix: Matrix? = null
+    private var mLocatorMatrix: Matrix? = null
     protected var mScrolledY: Float = 0f
     protected var mScrolledX: Float = 0f
     protected lateinit var mScroller: Scroller
@@ -36,12 +44,8 @@ open class BaseEditView : View {
     protected var mIsScrollingY: Boolean = false
     protected var mCurrentZoomScaleIndex = INIT_ZOOM_SCALES_INDEX
     protected var mViewScale = ZOOM_SCALES[INIT_ZOOM_SCALES_INDEX]
-    protected var mHouseList: ArrayList<RectRoom>? = ArrayList()
-    var freeRoomData = ArrayList<FreeRoom>()
-        protected set
     protected var mNameArrays = ArrayList<String>()
     protected lateinit var mHousePaint: Paint
-    protected var mCurrentNEAR: Int = 0
 
     protected var mSelectedViewIndex: Int = 0
     protected lateinit var mTextPaint: Paint
@@ -50,7 +54,6 @@ open class BaseEditView : View {
     protected lateinit var mLinePaint: Paint
     protected var mLastSeletedViewIndex: Int = 0
     protected lateinit var mGridPaint: Paint
-    protected var mScaleGestureDetector: ScaleGestureDetector? = null
     protected var mIsScale: Boolean = false
 
     protected var mCurrentMode: Int = 0
@@ -62,6 +65,7 @@ open class BaseEditView : View {
     protected var mZoomMidPoint = PointF(0f, 0f)
     protected var mMultiTouchOrgDis: Float = 0.toFloat()
     protected var mTotalScaled = 1f
+    protected var mCurrentScaled = 1f
     protected var mScaled = 0f
     protected lateinit var mWallCornerPaint: Paint
 
@@ -72,6 +76,7 @@ open class BaseEditView : View {
 
     protected var mHouseDetail: IpsHouse? = null
     protected var mHouseBitmap: Bitmap? = null
+    protected var mDotBitmap: Bitmap? = null
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -120,16 +125,15 @@ open class BaseEditView : View {
         mTextPaint.alpha = 1000//设置透明度
 
 
-
         mLinePaint = Paint(/*Paint.ANTI_ALIAS_FLAG*/);
         mLinePaint.setStyle(Paint.Style.STROKE);//画线条，线条有宽度
-        mLinePaint.setColor(getResources().getColor(R.color.bg_grid_red));
+        mLinePaint.color = ContextCompat.getColor(mContext, R.color.bg_grid_red)
         mLinePaint.setStrokeWidth(3f);//线条宽度
         mLinePaint.setPathEffect(DashPathEffect(floatArrayOf(5.0f, 6.0f), 0f));//线的显示效果：破折号格式
 
 
         mGridPaint = Paint()
-        mGridPaint.color = resources.getColor(R.color.bg_grid_red)
+        mGridPaint.color = ContextCompat.getColor(mContext, R.color.bg_grid_red)
         mGridPaint.strokeJoin = Paint.Join.ROUND
         mGridPaint.strokeCap = Paint.Cap.ROUND
         mGridPaint.strokeWidth = 1f
@@ -145,59 +149,119 @@ open class BaseEditView : View {
 
     }
 
-    fun setMode(mode: Int) {
-        mCurrentMode = mode
-        mSelectedDotIndex = NONE_TOUCH
-        mLastSeletedDotIndex = NONE_TOUCH
-        mSelectedViewIndex = NONE_TOUCH
-        mLastSeletedViewIndex = NONE_TOUCH
-        postInvalidate()
+    fun setHouseDetail(ipsHouse: IpsHouse?) {
+        ipsHouse?.let {
+            mHouseDetail = ipsHouse
+            Log.d(TAG, "setHouseDetail mHouseDetail=$mHouseDetail")
+            postInvalidate()
+        }
+
     }
 
+    /**
+     * 绘制户型图
+     * 返回左上角的坐标
+     */
+    fun drawHouseBitmap(canvas: Canvas) {
+        var paint = Paint()
+        paint.isAntiAlias = true
 
-    protected fun drawEverySideLength(canvas: Canvas, room: FreeRoom) {
-        val points = room.dotList
-        if (points == null || points.size < 2) {
+        if (mHouseDetail == null || TextUtils.isEmpty(mHouseDetail!!.mImageFilePath)) {
             return
         }
-        for (index in 0 until points.size - 1) {
-            val curNode = points[index]
-            val nextNode = points[index + 1]
-            val path = Path()
-            path.moveTo(curNode.x, curNode.y)
-            path.lineTo(nextNode.x, nextNode.y)
-            val dis = MathUtil.distance(curNode.x, curNode.y,
-                    nextNode.x, nextNode.y)
-            val length = dis / DEFAULT_PIX_INTERVAL * MESH_ROW_DISTANCE
-            val text = String.format("%.1f", length)
-            val textPaintWidth = mTextPaint.measureText(text)
-            canvas.drawTextOnPath(text, path, dis / 2 - textPaintWidth, -WALL_WIDTH, mTextPaint)
+        if (mHouseBitmap == null) {
+            val file = File(mHouseDetail!!.mImageFilePath)
+            if (file.exists()) {
+                val uri = Uri.fromFile(file)
+                val bitmap = BitmapFactory.decodeStream(
+                        mContext.contentResolver.openInputStream(uri))
+                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
+            }
         }
+        Log.d("ryq", " mHouseBitmap!!.width=" + mHouseBitmap!!.width + "  mHouseBitmap!!.height=" + mHouseBitmap!!.height
+                + " width=" + width + " height=" + height)
+        if (mImgMatrix == null) {
+            mImgMatrix = Matrix()
+            mImgMatrix?.preTranslate(getImgInitialLeft(), getImgInitialTop())
+        } else if (MODE_DRAG == mMode) {
+            /**只有在拖拉过程中用postTranslate,基于之前的位移操作进行变换,不会清除之前的位移。
+             * setTranslate会清除之前的位移。postTranslate和preTranslate是基于之前的操作变化，不会清除之前的位移。
+             * postTranslate： M' = T(dx, dy) * M
+             * preTranslate：M' = M * T(dx, dy)
+             *  且setTranslate会清除之前的位移和setScale不可同时使用
+             */
+            mImgMatrix?.postTranslate(mCurrentDx, mCurrentDy)
+        } else if (MODE_ZOOM == mMode) {
+            //只有在缩放过程中可以用postScale， 基于之前的缩放操作进行变换
+            mImgMatrix?.postScale(mCurrentScaled, mCurrentScaled, mHouseBitmap!!.width / 2f, mHouseBitmap!!.height / 2f)
+        }
+
+        if (mHouseBitmap != null && mImgMatrix != null) {
+            canvas.drawBitmap(mHouseBitmap!!, mImgMatrix!!, paint)
+        }
+
     }
 
+    abstract fun getImgInitialLeft(): Float
 
-    protected fun drawRectRoomArea(canvas: Canvas, rect: RectF) {
-        val width = (rect.right - rect.left) / DEFAULT_PIX_INTERVAL * MESH_ROW_DISTANCE
-        val height = (rect.bottom - rect.top) / DEFAULT_PIX_INTERVAL * MESH_COL_DISTANCE
-        val str = String.format("s=%.1f m²", width * height)
-        val textPaintWidth = mTextPaint.measureText(str)
-        val fontMetrics = mTextPaint.fontMetrics
+    abstract fun getImgInitialTop(): Float
 
+    abstract fun getImgLeftAfterTransOrScale(): Float
 
-        //show the area
-        val textStartX = (rect.right - rect.left) / 2 + rect.left - textPaintWidth / 2
-        val textStartY = (rect.bottom - rect.top) / 2 + rect.top + fontMetrics.bottom - fontMetrics.top
-        canvas.drawText(str, textStartX, textStartY, mTextPaint)
-        //show the width
-        val strWidth = String.format("w=%.1f", width)
-        canvas.drawText(strWidth, textStartX, rect.top + WALL_WIDTH, mTextPaint)
-        //show the Height
-        val strHeight = String.format("h=%.1f", height)
-        val strHeightWidth = mTextPaint.measureText(strHeight)
-        val path = Path()
-        path.moveTo(rect.right - WALL_WIDTH, rect.top + (rect.bottom - rect.top - strHeightWidth) / 2)
-        path.lineTo(rect.right - WALL_WIDTH, rect.bottom - (rect.bottom - rect.top - strHeightWidth) / 2)
-        canvas.drawTextOnPath(strHeight, path, 0f, 0f, mTextPaint)
+    abstract fun getImgTopAfterTransOrScale(): Float
+
+    /**
+     * 此时pivotX=0.0 pivotY=0.0
+     */
+    /* override fun onFinishInflate() {
+         super.onFinishInflate()
+         pivotX = width / 2.0f
+         pivotY = height / 2.0f
+     }*/
+
+    /**
+     *
+     */
+    fun drawAllLocator(canvas: Canvas): ArrayList<PointF>? {
+        var paint = Paint()
+        paint.isAntiAlias = true
+        if (mHouseDetail == null || mHouseDetail!!.mData == null) {
+            return null
+        }
+
+        var index = 0
+        if (mDotBitmap == null) {
+            val temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
+            mDotBitmap = Bitmap.createBitmap(temp)
+        }
+        var points = ArrayList<PointF>(mHouseDetail!!.mData!!.size)
+        //draw locators
+        var startX = getImgLeftAfterTransOrScale()
+        var startY = getImgTopAfterTransOrScale()
+
+        while (index < mHouseDetail!!.mData!!.size) {
+            var locator = mHouseDetail!!.mData!![index]
+            if (locator.mIsSelected || locator.mIsAdded) {
+                var matrix = Matrix()
+                var transx = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled
+                var transy = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled
+                android.util.Log.d("ryq", " drawAllLocator index=" + index
+                        + " locator.mLocationActual.x=" + locator.mLocationActual.x
+                        + " locator.mLocationActual.y=" + locator.mLocationActual.y
+                        + " transx=" + transx
+                        + " transy=" + transy)
+                var point = PointF(transx, transy)
+                points.add(point)
+                matrix.setTranslate(point.x - mDotBitmap!!.width / 2, point.y - mDotBitmap!!.height / 2)
+                mDotBitmap?.let {
+                    canvas.drawBitmap(it, matrix, paint)
+                }
+
+            }
+            index++
+
+        }
+        return points
     }
 
     /**
@@ -234,12 +298,6 @@ open class BaseEditView : View {
         for (i in 0 until bitmap.width / pixInterval) {
             bimapCanvas.drawLine((i * pixInterval).toFloat(), 0f, (i * pixInterval).toFloat(), bitmap.height.toFloat(), mGridPaint)
         }
-        //android.util.Log.d("ryq", " bitmap1 getTranslationX=" + getTranslationX() + " getTranslationY=" + getTranslationY()
-        //        + " BITMAP_WIDTH=" + BITMAP_WIDTH + " BITMAP_HEIGHT=" + BITMAP_HEIGHT);
-        android.util.Log.d("ryq", "drawBackground  mScaled=$mScaled")
-        android.util.Log.d("ryq", "drawBackground bitmap1 getWidth()=" + bitmap.width + " bitmap getHeight()=" + bitmap.height
-                + "  getScrollX()=" + scrollX + " getScrollY()=" + scrollY
-                + " bitmap1 getTranslationX=" + translationX + " getTranslationY=" + translationY)
 
         val myMatrix = MyMatrix.translationMatrix(-bitmap.width / 2 + mScrolledX, -bitmap.height / 2 + mScrolledY)
         canvas.drawBitmap(bitmap, myMatrix, paintBmp)
@@ -269,5 +327,91 @@ open class BaseEditView : View {
         val DEFAULT_DOT_RADIUS = 20f
         val MESH_ROW_DISTANCE = 0.5f
         val MESH_COL_DISTANCE = 0.5f
+        /**
+         * 拖拉模式
+         */
+        private val MODE_DRAG = 1
+        /**
+         * 放大缩小模式
+         */
+        private val MODE_ZOOM = 2
     }
+
+    /**
+     * 记录是放大缩小模式还是拖拉模式
+     */
+    var mMode = 0// 初始状态
+    /**
+     * 用于记录开始时候的坐标位置
+     */
+    var mTotalDx = 0f
+    var mTotalDy = 0f
+    var mCurrentDx = 0f
+    var mCurrentDy = 0f
+    val mStartPoint = PointF()
+    val mLastPoint = PointF()
+    /**
+     * 两个手指的开始距离
+     */
+    var mStartDis: Float = 0.toFloat()
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+
+        /** 通过与运算保留最后八位 MotionEvent.ACTION_MASK = 255  */
+        when (event?.action?.and(MotionEvent.ACTION_MASK)) {
+            // 手指压下屏幕
+            MotionEvent.ACTION_DOWN -> {
+                mMode = MODE_DRAG
+                // 记录ImageView当前的移动位置
+                //mCurrentMatrix.set(mImageView.imageMatrix)
+                mStartPoint.set(event.x, event.y)
+                mLastPoint.set(event.x, event.y)
+            }
+            // 当屏幕上已经有触点(手指)，再有一个触点压下屏幕
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                mMode = MODE_ZOOM
+                /** 计算两个手指间的距离  */
+                mStartDis = MathUtil.distance(event.getX(1), event.getY(1), event.getX(0), event.getY(0))// 结束距离
+            }
+            // 手指在屏幕上移动，改事件会被不断触发
+            MotionEvent.ACTION_MOVE ->
+                // 拖拉图片
+                if (mMode == MODE_DRAG) {
+
+                    //val dx = event.x - mStartPoint.x // 得到x轴的移动距离
+                    //val dy = event.y - mStartPoint.y // 得到x轴的移动距离
+                    // 在没有移动之前的位置上进行移动
+
+                    mCurrentDx = event.x - mLastPoint.x
+                    mCurrentDy = event.y - mLastPoint.y
+                    mLastPoint.set(event.x, event.y)
+
+                    mTotalDx += mCurrentDx
+                    mTotalDy += mCurrentDy
+
+                    invalidate()
+
+                } else if (mMode == MODE_ZOOM) {
+                    val endDis = MathUtil.distance(event.getX(1), event.getY(1), event.getX(0), event.getY(0))// 结束距离
+                    if (endDis > 10f) { // 两个手指并拢在一起的时候像素大于10
+                        // val scale = endDis / mStartDis// 得到缩放倍数
+                        mCurrentScaled = endDis / mStartDis
+                        if (mTotalScaled * mCurrentScaled > 0.5 && mTotalScaled * mCurrentScaled < 5) {
+                            mTotalScaled *= mCurrentScaled
+                            mStartDis = endDis
+                            invalidate()
+                        }
+
+
+                    }
+                }// 放大缩小图片
+            // 手指离开屏幕
+            MotionEvent.ACTION_UP,
+                // 当触点离开屏幕，但是屏幕上还有触点(手指)
+            MotionEvent.ACTION_POINTER_UP -> mMode = 0
+        }
+
+        return true
+    }
+
 }

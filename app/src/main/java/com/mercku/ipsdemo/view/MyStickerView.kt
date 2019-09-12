@@ -16,6 +16,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Region
 import android.net.Uri
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -50,17 +51,6 @@ class MyStickerView : BaseEditView {
 
     }
 
-
-    fun setHouseDetail(ipsHouse: IpsHouse?) {
-        ipsHouse?.let {
-            mHouseDetail = ipsHouse
-            Log.d(BaseEditView.TAG, "setHouseDetail mHouseDetail=" + mHouseDetail)
-            postInvalidate()
-        }
-
-    }
-
-
     override fun onDraw(canvas: Canvas) {
 
         canvas.drawColor(Color.WHITE)
@@ -70,95 +60,86 @@ class MyStickerView : BaseEditView {
     }
 
     private fun drawHouseDetail(canvas: Canvas) {
-        var paint = Paint()
-        paint.isAntiAlias = true
 
-        Log.d(BaseEditView.TAG, "drawHouseDetail canvas mHouseBitmap=" + mHouseBitmap)
+        drawHouseBitmap(canvas)
+        var points = drawAllLocator(canvas)
 
-        mHouseDetail?.mImageFilePath?.let {
-            var file = File(mHouseDetail!!.mImageFilePath)
-            if (file.exists()) {
-                var uri = Uri.fromFile(file)
-                var bitmap = BitmapFactory.decodeStream(
-                        mContext.getContentResolver().openInputStream(uri))
-                android.util.Log.d("ryq", "drawHouseDetail  bitmap=" + bitmap)
-                mHouseBitmap = BitmapUtil.resizeBitmap(bitmap, width, height)
-            }
+        //get sticker's location
+        var center = MathUtil.getPolygenCenter(points)
+        var curX = width / 2.0f
+        var curY = height / 2.0f
 
-            var imgMatrix = Matrix()
-            var imgDx = width / 2.0f - mHouseBitmap!!.width / 2.0f
-            var imgDy = height / 3.0f - mHouseBitmap!!.height / 2.0f
-            imgMatrix.preTranslate(imgDx, imgDy)
-            canvas.drawBitmap(mHouseBitmap, imgMatrix, paint)
-
-
-            mHouseDetail?.mData?.let {
-                var index = 0
-                var temp = BitmapFactory.decodeResource(resources, R.drawable.ic_location)
-                var dotBitmp = Bitmap.createBitmap(temp);
-                var points = ArrayList<PointF>(mHouseDetail!!.mData!!.size)
-                //draw locators
-                while (index < mHouseDetail!!.mData!!.size) {
-                    var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mIsSelected || locator.mIsAdded) {
-
-                        var matrix = Matrix()
-                        var transx = imgDx + mHouseBitmap!!.width * locator.mLocationActual.x
-                        var transy = imgDy + mHouseBitmap!!.height * locator.mLocationActual.y
-
-                        var point = PointF(transx, transy)
-                        points.add(point)
-                        matrix.preTranslate(point.x - dotBitmp.width / 2, point.y - dotBitmp.height / 2)
-                        canvas.drawBitmap(dotBitmp, matrix, paint)
-                    }
-                    index++
-
-                }
-                //get sticker's location
-                var center = MathUtil.getPolygenCenter(points)
-                var unit = mHouseDetail!!.mBitmapActualWidth / mHouseBitmap!!.width
-                var curX = width / 2.0f
-                var curDisX = curX * unit
-                var curY = center.cy
-                var curDisY = curY * unit
-
-                //draw lines from dot to sticker
-                index = 0
-                while (index < mHouseDetail!!.mData!!.size) {
-                    var locator = mHouseDetail!!.mData!![index]
-                    if (locator.mIsSelected || locator.mIsAdded) {
-                        var nextX = (imgDx + mHouseBitmap!!.width * locator.mLocationActual.x)
-                        var nextDisX = nextX * unit
-                        var nextY = (imgDy + mHouseBitmap!!.height * locator.mLocationActual.y)
-                        var nextDisY = nextY * unit
-                        android.util.Log.d("ryq", "drawHouseDetail2  mHouseDetail!!.mBitmapActualWidth=" + mHouseDetail!!.mBitmapActualWidth)
-                        var actualDis = Math.sqrt(((curDisX - nextDisX) * (curDisX - nextDisX) + (curDisY - nextDisY) * (curDisY - nextDisY)).toDouble())
-                        var pixDis = Math.sqrt(((curX - nextX) * (curX - nextX) + (curY - nextY) * (curY - nextY)).toDouble())
-                        canvas.drawLine(curX, curY, nextX, nextY, mLinePaint)
-                        var path = Path()
-                        path.moveTo(curX, curY)
-                        path.lineTo(nextX, nextY)
-                        //距离有问题，可能因为坐标错误
-                        android.util.Log.d("ryq", "drawHouseDetail2  dis=" + actualDis + " pixDis=" + pixDis)
-                        var disStr: String = String.format("%.1f", actualDis)
-                        canvas.drawTextOnPath(disStr + "m", path, (pixDis / 2).toFloat(), 0f, mTextPaint)
-                    }
-                    index++
-
-                }
-                //draw sticker
-                var stickerTemp = BitmapFactory.decodeResource(resources, R.drawable.ic_sticker)
-                var stickerBitmp = Bitmap.createBitmap(stickerTemp);
-                var matrix = Matrix()
-                matrix.preTranslate(curX - stickerBitmp.width / 2 /*+ temp.width / 2*/, curY - stickerBitmp.height / 2 /*+ temp.height / 2*/)
-                canvas.drawBitmap(stickerBitmp, matrix, paint)
-
-            }
-
-        }
-
+        var stickerPoint = PointF(curX, curY)
+        drawLineWithSticker(stickerPoint, canvas)
+        drawSticker(stickerPoint, canvas)
 
     }
 
+    private fun drawSticker(stickerPoint: PointF, canvas: Canvas) {
+        var stickerTemp = BitmapFactory.decodeResource(resources, R.drawable.ic_sticker)
+        var stickerBitmp = Bitmap.createBitmap(stickerTemp);
+        var matrix = Matrix()
+        matrix.preTranslate(stickerPoint.x - stickerBitmp.width / 2, stickerPoint.y - stickerBitmp.height / 2)
+        var paint = Paint()
+        paint.isAntiAlias = true
+        canvas.drawBitmap(stickerBitmp, matrix, paint)
+    }
+
+    private fun drawLineWithSticker(curPoint: PointF, canvas: Canvas) {
+        var index = 0
+        var unit = mHouseDetail!!.mBitmapActualWidth / (mHouseBitmap!!.width * mTotalScaled)
+        var curDisX = curPoint.x * unit
+        var curDisY = curPoint.y * unit
+        var startX = getImgLeftAfterTransOrScale()
+        var startY = getImgTopAfterTransOrScale()
+        while (index < mHouseDetail!!.mData!!.size) {
+            var locator = mHouseDetail!!.mData!![index]
+            if (locator.mIsSelected || locator.mIsAdded) {
+                var nextX = startX + mHouseBitmap!!.width * locator.mLocationActual.x * mTotalScaled
+                var nextDisX = nextX * unit
+                var nextY = startY + mHouseBitmap!!.height * locator.mLocationActual.y * mTotalScaled
+                var nextDisY = nextY * unit
+                var actualDis = MathUtil.distance(curDisX, curDisY, nextDisX, nextDisY)
+                var pixDis = MathUtil.distance(curPoint.x, curPoint.y, nextX, nextY)
+
+                canvas.drawLine(curPoint.x, curPoint.y, nextX, nextY, mLinePaint)
+
+                var path = Path()
+                path.moveTo(curPoint.x, curPoint.y)
+                path.lineTo(nextX, nextY)
+                //距离有问题，可能因为坐标错误
+                var disStr: String = String.format("%.1f", actualDis)
+                canvas.drawTextOnPath(disStr + "m", path, (pixDis / 2).toFloat(), 0f, mTextPaint)
+            }
+            index++
+
+        }
+    }
+    override fun getImgInitialLeft(): Float {
+        var left = (width / 2.0f - mHouseBitmap!!.width / 2.0f)
+        android.util.Log.d("ryq", " getImgInitialLeft left=" + left)
+        return left
+    }
+
+    override fun getImgInitialTop(): Float {
+        var top = (height / 2.0f - mHouseBitmap!!.height / 2.0f)
+        android.util.Log.d("ryq", " getImgInitialTop top=" + top)
+        return top
+    }
+
+
+    override fun getImgLeftAfterTransOrScale(): Float {
+        var left = (width / 2f - mHouseBitmap!!.width * mTotalScaled / 2f) + mTotalDx
+        android.util.Log.d("ryq", " getImgLeftAfterTransOrScale left=" + left)
+        return left
+
+    }
+
+    override fun getImgTopAfterTransOrScale(): Float {
+        var top = height / 2f - mHouseBitmap!!.height * mTotalScaled / 2f + mTotalDy
+        android.util.Log.d("ryq", " getImgLeftAfterTransOrScale top=" + top)
+        return top
+
+    }
 
 }
