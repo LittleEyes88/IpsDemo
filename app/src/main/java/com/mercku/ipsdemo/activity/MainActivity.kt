@@ -86,8 +86,15 @@ class MainActivity : DeleteModeActivity(), EasyPermissions.PermissionCallbacks, 
             mViewStub.visibility = View.GONE
             mAddNewHouseButton.visibility = View.VISIBLE
             mRecyclerView.visibility = View.VISIBLE
+
+            mIsEditMode = false
+            mHouseLayoutAdapter.setDeleteMode(false)
+            setRightTitleText(getText(R.string.edit).toString())
+            mTitleView?.isSelected = false
+
             houseList
         }
+
         mHouseLayoutAdapter.setDataList(mData)
     }
 
